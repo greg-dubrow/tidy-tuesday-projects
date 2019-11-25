@@ -1,3 +1,5 @@
+# charts from Baltimore bridges data, Tidy Tuesday Nov 27, 2018
+
 library(tidytuesdayR)
 library(tidyverse)
 library(tidylog)
