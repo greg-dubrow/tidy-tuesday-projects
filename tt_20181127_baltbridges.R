@@ -168,7 +168,8 @@ tt_baltdf %>%
   ggplot(aes(inspect_months, age, color = county)) +
   geom_point() +
   scale_color_brewer(palette="Dark2") +
-  labs(x = "Months since last inspection (from current date)",
+  labs(title = "Months since last inspection (from current date)", 
+       x = "Months since last inspection (from current date)",
        y = "Age (in years)") +
   theme_minimal()
 
@@ -205,7 +206,7 @@ tt_baltdf %>%
   geom_text(aes(y = lq, label = comma(lq, digits = 0)), 
             size = 4, color = "navy", hjust = 1.2) +
   scale_y_continuous(label = comma) +
-  labs(title = "Median & interquartile months since last inspection, by county" , 
+  labs(title = "Median & interquartile ranges of average daily riders per bridge, by county" , 
        x = "", y = "") +
   theme_minimal() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
@@ -216,8 +217,10 @@ tt_baltdf %>%
   ggplot(aes(avg_daily_traffic, age, color = county)) +
   geom_point() +
   scale_color_brewer(palette="Dark2") +
-  labs(x = "Average daily traffic",
+  labs(title = "Average daily traffic per bridge, by county" , 
+        x = "Average daily traffic",
        y = "Age (in years)") +
   theme_minimal()
+# add legend position inside plot
 
   
