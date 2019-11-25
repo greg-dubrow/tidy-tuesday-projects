@@ -1,0 +1,24 @@
+---
+title: "IMDb_Economist_tv_ratings"
+author: "Greg Dubrow"
+date: "January 7, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(tidyverse)
+
+# always read in from "Raw"
+tvratings <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-01-08/IMDb_Economist_tv_ratings.csv")
+
+## average rating for shows in 1st season
+
+avg  
+
+```
+
