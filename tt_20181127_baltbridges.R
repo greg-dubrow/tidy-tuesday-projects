@@ -158,7 +158,8 @@ tt_baltdf %>%
   ggplot(aes(inspect_months, age)) +
   geom_point(color = "navy") +
   geom_smooth() +
-  labs(x = "Months since last inspection (from current date)",
+  labs(title = "Months since inspection, outliers removed", 
+       x = "Months since last inspection (from current date)",
        y = "Age (in years)") +
   theme_minimal()
 
