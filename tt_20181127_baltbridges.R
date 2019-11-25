@@ -14,14 +14,15 @@ today_yr <- as.numeric(format(today, format="%Y"))
 tt_available()
 
 
+# load balt bridge object via tidy tuesdayR
 tt_balt1 <- tt_load("2018-11-27")
 readme(tt_balt1)
 ls(tt_balt1)
 
-tt_baltdf1 <- as.data.frame(tt_balt1["baltimore_bridges"]) %>% 
-  mutate(vehicles_n = as.numeric(str_remove(baltimore_bridges.vehicles, " vehicles")))
+# convert to df
+tt_baltdf1 <- as.data.frame(tt_balt1["baltimore_bridges"]) 
 
-glimpse(tt_baltdf)
+glimpse(tt_baltdf1)
 
 # remove prefix from col names
 colnames(tt_baltdf1) <- sub("baltimore_bridges.", "", names(tt_baltdf1), fixed = TRUE)
@@ -30,6 +31,8 @@ glimpse(tt_baltdf1)
 # create decade of bridge built, age of bridge relative to current, fix county
 tt_baltdf <- tt_baltdf1 %>%
   mutate(age = today_yr - yr_built) %>%
+#  mutate(vehicles_n = as.numeric(str_remove(vehicles, " vehicles")))
+    ## not needed, avg_daily_traffic has same info
   mutate(inspection_yr = inspection_yr + 2000) %>%
   mutate(county = ifelse(county == "Baltimore city", "Baltimore City", county)) %>%
   mutate(bridge_condition = factor(bridge_condition, levels = c("Good", "Fair", "Poor"))) %>%
@@ -78,14 +81,19 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
 ## percent bridge condition by county
+# need to create df object to do subset label call in bar chart
+brcondcty <- 
 tt_baltdf %>%
   count(county, bridge_condition) %>%
   group_by(county) %>%
   mutate(pct = n / sum(n)) %>%
-  ungroup() %>%
-  ggplot(aes(x = county, y = pct, fill = bridge_condition)) +
+  ungroup() 
+
+ggplot(brcondcty, aes(x = county, y = pct, fill = bridge_condition)) +
   geom_bar(stat = "identity") +
-  ## add geom_text label pct subset for good & fair
+  geom_text(data = subset(brcondcty, bridge_condition != "Poor"), 
+            aes(label = percent(pct)), position = "stack", 
+            color= "#585858", vjust = 1, size = 3.5) +
   scale_y_continuous(label = percent_format()) +
   labs(title = "Percent bridge condition by county" , 
         x = "", y = "", fill = "Bridge Condition") +
