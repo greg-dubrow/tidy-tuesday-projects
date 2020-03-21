@@ -9,11 +9,14 @@ tt_available()
 
 # read in object
 tt_bike <- tt_load("2019-11-05")
+tt_bike_gh <- tt_load_gh("2019-11-05")
+
+glimpse(tt_bike_gh)
 # loads readme
-readme(tt_bike)
+readme(tt_bike_gh)
 
 # change object to dataframe
-tt_bikedf <- tt_bike %>%
+tt_bikedf <- tt_bike_gh %>%
   tt_read_data("commute.csv")
   
 glimpse(tt_bikedf)
