@@ -10,6 +10,7 @@ tt_available()
 # read in object
 tt_bike <- tt_load("2019-11-05")
 tt_bike_gh <- tt_load_gh("2019-11-05")
+tt_wabridge <- tt_load("2020-11-24")
 
 glimpse(tt_bike_gh)
 # loads readme
@@ -20,3 +21,5 @@ tt_bikedf <- tt_bike_gh %>%
   tt_read_data("commute.csv")
   
 glimpse(tt_bikedf)
+
+tt_wabridgedf <- tt_wabridge$hike_data
