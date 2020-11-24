@@ -1,9 +1,13 @@
 library(tidytuesdayR)
 library(tidyverse)
 library(tidylog)
-library(tidygraph)
-library(ggraph)
+#library(tidygraph)
+#library(ggraph)
 library(gt)
+library(reactable)
+library(htmltools)
+
+# reactable code-thru example at https://themockup.blog/posts/2020-05-13-reactable-tables-the-rest-of-the-owl
 
 # read in object
 tt_watrail <- tt_load("2020-11-24")
@@ -68,8 +72,10 @@ tt_watraildf %>%
   tt_watraildf %>%
   count(rating_grp, rating) %>%
   view()
-  
+
+#byregion <-  
 tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
   group_by(location_region) %>%
   summarise(n_region = n(),
     avglength = mean(length_miles),
@@ -77,8 +83,24 @@ tt_watraildf %>%
     avggain = mean(gain),
     avghigh = mean(highpoint),
     minhigh = min(highpoint),
-    maxhigh = max(highpoint))
+    maxhigh = max(highpoint)) %>%
+  mutate_at(vars(avglength:avgrating), round, 2) %>%
+  mutate_at(vars(avggain:avghigh), round, 0) %>%
+  reactable(pagination = FALSE, compact = TRUE, 
+            borderless = FALSE, striped = TRUE,
+            columns = list(
+              location_region = colDef(name = "Region"),
+              n_region = colDef(name = "N"),
+              avglength = colDef(name = "Avg Length (miles) ", align = "center"),
+              avgrating = colDef(name = "Avg Rating", align = "center"),
+              avggain = colDef(name = "Avg Gain", align = "center"),
+              avghigh = colDef(name = "Avg High Point", align = "center"),
+              minhigh = colDef(name = "Min High Point", align = "center"),
+              maxhigh = colDef(name = "Max High Point", align = "center")
+              ))
+  
 
+## reactable table of averages by region
 tt_watraildf %>%
   group_by(rating_grp) %>%
   summarise(n_region = n(),
