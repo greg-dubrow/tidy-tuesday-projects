@@ -127,8 +127,34 @@ tt_watraildf %>%
   facet_wrap(vars(location_region))
 
 
-### reactable tables
-## create color palates for conidtional cell colors
+
+## gt table
+
+# create by region averages df
+byregion <-  tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  group_by(location_region) %>%
+  summarise(n_region = n(),
+            avglength = mean(length_miles),
+            avgrating = mean(rating),
+            avggain = mean(gain),
+            avghigh = mean(highpoint),
+            minhigh = min(highpoint),
+            maxhigh = max(highpoint)) %>%
+  mutate_at(vars(avglength:avgrating), round, 2) %>%
+  mutate_at(vars(avggain:avghigh), round, 0) 
+
+# create table
+byregion %>%
+  gt() %>%
+  data_color(
+    columns = vars(avglength, avgrating, avggain, avghigh),
+    colors = scales::col_numeric(
+      palette = c("#ffffff", "#f2fbd2", "#c9ecb4", "#93d3ab", "#35b0ab"),
+      domain = NULL)) 
+
+## reactable table
+## create color palate objects for conidtional cell colors
 
 make_color_pal <- function(colors, bias = 1) {
   get_color <- colorRamp(colors, bias = bias)
@@ -140,20 +166,8 @@ good_color <- make_color_pal(c("#ffffff", "#f2fbd2", "#c9ecb4", "#93d3ab", "#35b
 # seq(0.1, 0.9, length.out = 12) %>%
 #   good_color() %>%
 #   scales::show_col()
-  
-byregion <-  tt_watraildf %>%
-  distinct(name, .keep_all = TRUE) %>%
-  group_by(location_region) %>%
-  summarise(n_region = n(),
-    avglength = mean(length_miles),
-    avgrating = mean(rating),
-    avggain = mean(gain),
-    avghigh = mean(highpoint),
-    minhigh = min(highpoint),
-    maxhigh = max(highpoint)) %>%
-  mutate_at(vars(avglength:avgrating), round, 2) %>%
-  mutate_at(vars(avggain:avghigh), round, 0) 
 
+# use by region set created for gt 
 tbl_region <-
 byregion %>%
   reactable(pagination = FALSE, compact = TRUE, 
