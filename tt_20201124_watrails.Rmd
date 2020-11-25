@@ -78,7 +78,7 @@ tt_watraildf <- tt_watrail$hike_data %>%
 
 ### To get a sense of what the data look like, I'll run a few scatterplots to see how things cluster, if there are 
 ### outliers, etc...
-```{r echo = FALSE}
+```{r echo = FALSE, warning=FALSE }
 
 tt_watraildf %>%
   ggplot(aes(length_miles, gain)) +
