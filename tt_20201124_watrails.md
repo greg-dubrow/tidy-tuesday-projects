@@ -64,6 +64,14 @@ Cascades & Rainier.
     #> filter: removed 1,853 rows (>99%), 5 rows remaining
     #> filter: no rows removed
     #> select: dropped 11 variables (location_specific, trail_type, highpoint, rating, rating_grp, …)
+    #> # A tibble: 5 x 4
+    #>   location_region    name                                     length_miles  gain
+    #>   <chr>              <chr>                                           <dbl> <dbl>
+    #> 1 Southwest Washing… Pacific Crest Trail (PCT) Section H - B…         148. 27996
+    #> 2 South Cascades     Pacific Crest Trail (PCT) Section I - W…          99  17771
+    #> 3 Central Cascades   Pacific Crest Trail (PCT) Section K - S…         117  26351
+    #> 4 North Cascades     Pacific Northwest Trail - Pasayten Trav…         119  21071
+    #> 5 Mount Rainier Area Wonderland Trail                                  93  22000
 
     #> `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
