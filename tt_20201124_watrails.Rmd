@@ -1,0 +1,95 @@
+---
+title: "Tidy Tuesday 11/24/2020 Washington Trails"
+author: "greg dubrow"
+date: "11/24/2020"
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "images/",
+  out.width = "100%") 
+```
+
+```{r pkg load, message=FALSE, ECHO = FALSE}
+# readin in data, create df for plots
+library(tidytuesdayR) # to load tidytuesday data
+library(tidyverse) # to do tidyverse things
+library(tidylog) # to get a log of what's happening to the data
+library(reactable) # pretty tables
+library(htmltools) # help with pretty tables
+library(RColorBrewer) # colors!
+library(scales) # format chart output
+library(lubridate) # dates!
+```
+
+## First let's read in the file using the tidytuesdayR package. We'll also look at the raw data
+```{r echo = FALSE, message=FALSE}
+tt_watrail <- tt_load("2020-11-24")
+
+glimpse(tt_watrail$hike_data)
+```
+
+### There are a few things we want to do with the data for the working dataframe: 
+  * create columns for miles, direction, type from length
+  * create specific location columns frolm location
+  * change rating, gain and highpoint to numeric
+  * create a rating group
+  * separate out features and make the resulting df long. we'll use distinct when we only need 1 obs per trail
+
+```{r echo = FALSE}
+tt_watraildf <- tt_watrail$hike_data %>%
+  mutate(length_miles = parse_number(length)) %>%
+  mutate(across(gain:rating, as.numeric)) %>%
+  mutate(rating_grp = case_when(rating == 0 ~ "0",
+                                rating >0 & rating < 2 ~ "1",
+                                rating >=2 & rating < 3 ~ "2",
+                                rating >=3 & rating < 4 ~ "3",
+                                rating >=4 & rating < 5 ~ "4",
+                                rating == 5 ~ "5")) %>%
+  mutate(trail_type = case_when(grepl("roundtrip", length) ~ "Round trip",
+                          grepl("one-way", length) ~ "One Way",
+                          grepl("of trails", length) ~ "Trails")) %>% 
+  mutate(location_split = location) %>%
+  separate(location_split, c("location_region","location_specific"), sep = ' -- ') %>%
+  unnest(cols = c(features)) %>% 
+  mutate(feature_init = case_when(features == "Dogs allowed on leash" ~ "DA",
+                                  features == "Dogs not allowed" ~ "DN",
+                                  features == "Wildlife" ~ "Wl",
+                                  features == "Good for kids" ~ "GK",
+                                  features == "Lakes" ~ "Lk",
+                                  features == "Fall foliage" ~ "FF",
+                                  features == "Ridges/passes" ~ "RP",
+                                  features == "Established campsites" ~ "EC",
+                                  features == "Mountain views" ~ "MV",
+                                  features == "Old growth" ~ "OG",
+                                  features == "Waterfalls" ~ "Wf",
+                                  features == "Wildflowers/Meadows" ~ "WM",
+                                  features == "Rivers" ~ "Ri",
+                                  features == "Coast" ~ "Co",
+                                  features == "Summits" ~ "Su")) %>%
+  mutate(feature_type = if_else(feature_init %in% c("DA","DN","GK"), "Companion", "Feature")) %>%
+  select(name, location_region, location_specific, trail_type, length_miles, 
+         gain, highpoint, rating, rating_grp, features, feature_init, feature_type, description, location, length)
+
+```
+
+### To get a sense of what the data look like, I'll run a few scatterplots to see how things cluster, if there are 
+### outliers, etc...
+```{r echo = FALSE}
+
+tt_watraildf %>%
+  ggplot(aes(length_miles, gain)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(vars(rating_grp))
+
+tt_watraildf %>%
+  ggplot(aes(highpoint, gain)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(vars(rating_grp))
+
+```

@@ -69,12 +69,25 @@ glimpse(tt_watraildf)
 tt_watraildf %>%
   count(features)
   
-  tt_watraildf %>%
+tt_watraildf %>% 
   count(rating_grp, rating) %>%
   view()
 
-#byregion <-  
-tt_watraildf %>%
+### reactable tables
+## create color palates for conidtional cell colors
+
+make_color_pal <- function(colors, bias = 1) {
+  get_color <- colorRamp(colors, bias = bias)
+  function(x) rgb(get_color(x), maxColorValue = 255)
+}
+good_color <- make_color_pal(c("#ffffff", "#f2fbd2", "#c9ecb4", "#93d3ab", "#35b0ab"), bias = 2)
+# good_color(seq(0.1, 0.9, length.out = 12))
+# 
+# seq(0.1, 0.9, length.out = 12) %>%
+#   good_color() %>%
+#   scales::show_col()
+  
+byregion <-  tt_watraildf %>%
   distinct(name, .keep_all = TRUE) %>%
   group_by(location_region) %>%
   summarise(n_region = n(),
@@ -85,20 +98,73 @@ tt_watraildf %>%
     minhigh = min(highpoint),
     maxhigh = max(highpoint)) %>%
   mutate_at(vars(avglength:avgrating), round, 2) %>%
-  mutate_at(vars(avggain:avghigh), round, 0) %>%
+  mutate_at(vars(avggain:avghigh), round, 0) 
+
+byregion %>%
   reactable(pagination = FALSE, compact = TRUE, 
             borderless = FALSE, striped = TRUE,
             columns = list(
               location_region = colDef(name = "Region"),
               n_region = colDef(name = "N"),
-              avglength = colDef(name = "Avg Length (miles) ", align = "center"),
-              avgrating = colDef(name = "Avg Rating", align = "center"),
-              avggain = colDef(name = "Avg Gain", align = "center"),
-              avghigh = colDef(name = "Avg High Point", align = "center"),
-              minhigh = colDef(name = "Min High Point", align = "center"),
-              maxhigh = colDef(name = "Max High Point", align = "center")
-              ))
-  
+              avglength = colDef(
+                name = "Avg Length (miles) ", align = "center",
+                style = function(value) {
+                  value
+                  normalized <- (value - min(byregion$avglength)) /
+                    (max(byregion$avglength) - min(byregion$avglength))
+                  color <- good_color(normalized)
+                  list(background = color)
+                }), 
+              avgrating = colDef(
+                name = "Avg Rating", align = "center",
+                style = function(value) {
+                  value
+                  normalized <- (value - min(byregion$avgrating)) /
+                    (max(byregion$avgrating) - min(byregion$avgrating))
+                  color <- good_color(normalized)
+                  list(background = color)
+                }),
+              avggain = colDef(
+                name = "Avg Gain", align = "center",
+                format = colFormat(separators = TRUE),
+                style = function(value) {
+                  value
+                  normalized <- (value - min(byregion$avggain)) /
+                    (max(byregion$avggain) - min(byregion$avggain))
+                  color <- good_color(normalized)
+                  list(background = color)
+                }),
+              avghigh = colDef(
+                name = "Avg High Point", align = "center",
+                format = colFormat(separators = TRUE),
+                style = function(value) {
+                  value
+                  normalized <- (value - min(byregion$avghigh)) /
+                    (max(byregion$avghigh) - min(byregion$avghigh))
+                  color <- good_color(normalized)
+                  list(background = color)
+                }),
+              minhigh = colDef(
+                name = "Min High Point", align = "center",
+                format = colFormat(separators = TRUE),
+                style = function(value) {
+                  value
+                  normalized <- (value - min(byregion$minhigh)) /
+                    (max(byregion$minhigh) - min(byregion$minhigh))
+                  color <- good_color(normalized)
+                  list(background = color)
+                }),
+              maxhigh = colDef(
+                name = "Max High Point", align = "center",
+                format = colFormat(separators = TRUE),
+                style = function(value) {
+                  value
+                  normalized <- (value - min(byregion$maxhigh)) /
+                    (max(byregion$maxhigh) - min(byregion$maxhigh))
+                  color <- good_color(normalized)
+                  list(background = color)
+                })))
+
 
 ## reactable table of averages by region
 tt_watraildf %>%
@@ -205,5 +271,12 @@ ggraph(correlation) +
         legend.box.margin = margin(.5,.5,.5,.5,"cm")) +
   # labels
   labs(title = "HIKING IN WASHINGTON:\nWHAT YOU'LL SEE AND WHO YOU'LL SEE IT WITH",
-       subtitle = "The Washington Trails Association helpfully provides a hiking guide written by local experts. Each trail is flagged with different features one will encounter\n- rivers, mountains, waterfalls - and the companions you can bring - children and/or dogs.\n\nThis graph explores the underlying relationship between these two categories. It is seen that child-friendly routes are also commonly dog-friendly, and that\nthe Trails Association discourages bringing children to mountainous routes with features like summits, ridges and passes. Kids are more than welcome to\nenjoy wildlife and coastal routes, however, and your dog will be happy to romp in the fall foliage!",
-       caption = "Data from the Washington Trails Association (www.wta.org) | Visualisation by Jack Davison (Twitter @JDavison_ | Github jack-davison)")
+       subtitle = "The Washington Trails Association helpfully provides a hiking guide written by local experts. 
+       Each trail is flagged with different features one will encounter\n- rivers, mountains, waterfalls - 
+       and the companions you can bring - children and/or dogs.\n\nThis graph explores the underlying relationship 
+       between these two categories. It is seen that child-friendly routes are also commonly dog-friendly, and 
+       that\nthe Trails Association discourages bringing children to mountainous routes with features like summits, 
+       ridges and passes. Kids are more than welcome to\nenjoy wildlife and coastal routes, however, and your dog 
+       will be happy to romp in the fall foliage!",
+       caption = "Data from the Washington Trails Association (www.wta.org) | 
+       Visualisation by Jack Davison (Twitter @JDavison_ | Github jack-davison)")
