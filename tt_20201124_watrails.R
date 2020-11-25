@@ -6,6 +6,7 @@ library(tidylog)
 library(gt)
 library(reactable)
 library(htmltools)
+library(patchwork)
 
 # reactable code-thru example at https://themockup.blog/posts/2020-05-13-reactable-tables-the-rest-of-the-owl
 
@@ -70,16 +71,48 @@ tt_watraildf %>%
   count(features)
   
 tt_watraildf %>% 
+  distinct(name, .keep_all = TRUE) %>%
   count(rating_grp, rating) %>%
   view()
 
-# exploratory scatterplots
+# exploratory analysis - histograms & scatterplots. use patchwork to stich together plot panels
+hist_length <-
+tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  ggplot(aes(length_miles)) +
+  geom_histogram(alpha = 0.8) +
+  scale_x_log10() +
+  labs(x = "Length (miles), log10")
+
+hist_gain <-
+  tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  ggplot(aes(gain)) +
+  geom_histogram(alpha = 0.8) +
+  scale_x_log10()
+
+hist_high <-
+  tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  ggplot(aes(highpoint)) +
+  geom_histogram(alpha = 0.8) 
+
+hist_rate <-
+  tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  ggplot(aes(rating)) +
+  geom_histogram(alpha = 0.8) 
+
+(hist_length | hist_gain) /
+  (hist_high | hist_rate)
+
 tt_watraildf %>%
   distinct(name, .keep_all = TRUE) %>%
   ggplot(aes(length_miles, gain)) +
   geom_point() +
   geom_smooth() +
-  labs(x = "Length (miles)", y = "Total Gain",
+  scale_x_log10() +
+  labs(x = "Length (miles) log10", y = "Total Gain",
        title = "Length v Gain, by Rating Group") +
   facet_wrap(vars(rating_grp))
 
@@ -88,7 +121,8 @@ tt_watraildf %>%
   ggplot(aes(length_miles, gain)) +
   geom_point() +
   geom_smooth() +
-  labs(x = "Length (miles)", y = "Total Gain",
+  scale_x_log10() +
+  labs(x = "Length (miles) log 10", y = "Total Gain",
        title = "Length v Gain, by Region") +
   facet_wrap(vars(location_region))
 
@@ -120,6 +154,7 @@ byregion <-  tt_watraildf %>%
   mutate_at(vars(avglength:avgrating), round, 2) %>%
   mutate_at(vars(avggain:avghigh), round, 0) 
 
+tbl_region <-
 byregion %>%
   reactable(pagination = FALSE, compact = TRUE, 
             borderless = FALSE, striped = TRUE,
@@ -185,8 +220,15 @@ byregion %>%
                   list(background = color)
                 })))
 
+div(class = "region",
+    div(class = "example-header",
+        div(class = "title", 
+            "Averages by Trail Region"),
+        tbl_region
+    )
+)
 
-## reactable table of averages by region
+## reactable table of averages by rating group
 tt_watraildf %>%
   group_by(rating_grp) %>%
   summarise(n_region = n(),
