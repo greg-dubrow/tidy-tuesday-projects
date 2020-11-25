@@ -2,11 +2,11 @@
     library(tidytuesdayR) # to load tidytuesday data
     library(tidyverse) # to do tidyverse things
     library(tidylog) # to get a log of what's happening to the data
+    library(patchwork) # stitch plots together
     library(reactable) # pretty tables
     library(htmltools) # help with pretty tables
     library(RColorBrewer) # colors!
     library(scales) # format chart output
-    library(lubridate) # dates!
 
 ### First let’s read in the file using the tidytuesdayR package. We’ll also look at the raw data
 
@@ -48,12 +48,17 @@
     #> mutate: new variable 'feature_type' (character) with 2 unique values and 0% NA
     #> select: columns reordered (name, location_region, location_specific, trail_type, length_miles, …)
 
-### To get a sense of what the data look like, I’ll run a few scatterplots to see how things cluster, if there are outliers or anything else especially noticable.
+### To get a sense of what the data look like, I’ll run some historgrams and scatterplots to see how things cluster, if there are outliers or anything else especially noticable.
 
-I plotted length by gain, faceting by ratings groups and then by region.
-We do have to be careful with ratings, as they are user-generated and
-some trails have very few votes.
-<img src="images/unnamed-chunk-3-1.png" width="100%" /><img src="images/unnamed-chunk-3-2.png" width="100%" />
+Using log10 for the length scale to even out the spread.
+[Patchwork](https://patchwork.data-imaginist.com/) stitches the plots
+together in a neat panel.
+<img src="images/unnamed-chunk-3-1.png" width="100%" /> For the
+scatterplots, I plotted length by gain, faceting by ratings groups and
+then by region. We do have to be careful with ratings, as they are
+user-generated and some trails have very few votes. Log10 used again for
+length.
+<img src="images/unnamed-chunk-4-1.png" width="100%" /><img src="images/unnamed-chunk-4-2.png" width="100%" />
 
 The outliers in terms of gain & length clustered in a few regions, so I
 wanted to see which they were. Not a surprise they clustered in the
@@ -68,6 +73,19 @@ Cascades & Rainier.
     #> 4 North Cascades     Pacific Northwest Trail - Pasayten Trav…         119  21071
     #> 5 Mount Rainier Area Wonderland Trail                                  93  22000
 
-    #> `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
+### Now that we see how the length, gain, highpoint & ratings spread out, I want build a table to see the averages by region.
 
-<img src="images/unnamed-chunk-5-1.png" width="100%" />
+I’ve been wanting to take a deeper dive on [gt](https://gt.rstudio.com/)
+& [reactable](https://glin.github.io/reactable/). So inspired by [Thomas
+Mock’s reacable
+primer](https://themockup.blog/posts/2020-05-13-reactable-tables-the-rest-of-the-owl),
+a basic table with heatmap-like formatting for some columns. Since I’m
+mostly recreating Thomas’ table (but with different data) I won’t
+comment to much code. See his explainer for details.
+<!--html_preserve-->
+
+Averages by Trail Region
+
+<script type="application/json" data-for="htmlwidget-76542ea27fcc8edc998f">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"location_region":["Central Cascades","Central Washington","Eastern Washington","Issaquah Alps","Mount Rainier Area","North Cascades","Olympic Peninsula","Puget Sound and Islands","Snoqualmie Region","South Cascades","Southwest Washington"],"n_region":[217,77,132,74,188,279,203,184,208,181,115],"avglength":[9.58,5.71,9.69,4.96,8.08,11.41,8.19,4.29,8.66,8.49,6.44],"avgrating":[3.04,2.82,2.23,2.52,3.37,3.1,3.32,2.82,3.22,3.07,2.7],"avggain":[2277,809,1644,954,1853,2534,1570,455,2171,1664,1166],"avghigh":[4750,2249,4449,1489,5228,5077,2825,568,4457,4770,1771],"minhigh":[600,240,300,250,800,125,20,10,450,922,20],"maxhigh":[9511,6876,7310,2948,10080,9200,6988,3750,9416,12276,7800]},"columns":[{"accessor":"location_region","name":"Region","type":"character"},{"accessor":"n_region","name":"N","type":"numeric"},{"accessor":"avglength","name":"Avg Length (miles) ","type":"numeric","align":"center","style":[{"background":"#6CC4AB"},{"background":"#D4F0BC"},{"background":"#68C3AB"},{"background":"#EBF8CC"},{"background":"#98D5AB"},{"background":"#35B0AB"},{"background":"#95D4AB"},{"background":"#FFFFFF"},{"background":"#87CEAB"},{"background":"#8DD0AB"},{"background":"#C0E7B2"}]},{"accessor":"avgrating","name":"Avg Rating","type":"numeric","align":"center","style":[{"background":"#73C7AB"},{"background":"#9AD6AC"},{"background":"#FFFFFF"},{"background":"#C8EBB3"},{"background":"#35B0AB"},{"background":"#67C2AB"},{"background":"#3EB3AB"},{"background":"#9AD6AC"},{"background":"#51BAAB"},{"background":"#6DC5AB"},{"background":"#ACDFAF"}]},{"accessor":"avggain","name":"Avg Gain","type":"numeric","format":{"cell":{"separators":true},"aggregated":{"separators":true}},"align":"center","style":[{"background":"#4FB9AB"},{"background":"#DAF2C0"},{"background":"#90D2AB"},{"background":"#CBECB5"},{"background":"#7BCAAB"},{"background":"#35B0AB"},{"background":"#97D5AB"},{"background":"#FFFFFF"},{"background":"#5ABDAB"},{"background":"#8ED1AB"},{"background":"#B9E4B1"}]},{"accessor":"avghigh","name":"Avg High Point","type":"numeric","format":{"cell":{"separators":true},"aggregated":{"separators":true}},"align":"center","style":[{"background":"#4BB8AB"},{"background":"#B5E3B0"},{"background":"#58BDAB"},{"background":"#D4F0BC"},{"background":"#35B0AB"},{"background":"#3BB2AB"},{"background":"#A0D9AD"},{"background":"#FFFFFF"},{"background":"#58BDAB"},{"background":"#4AB7AB"},{"background":"#C7EBB3"}]},{"accessor":"minhigh","name":"Min High Point","type":"numeric","format":{"cell":{"separators":true},"aggregated":{"separators":true}},"align":"center","style":[{"background":"#80CCAB"},{"background":"#C8EBB3"},{"background":"#BDE6B2"},{"background":"#C6EAB3"},{"background":"#51BAAB"},{"background":"#E4F5C7"},{"background":"#FCFEF7"},{"background":"#FFFFFF"},{"background":"#A0D9AD"},{"background":"#35B0AB"},{"background":"#FCFEF7"}]},{"accessor":"maxhigh","name":"Max High Point","type":"numeric","format":{"cell":{"separators":true},"aggregated":{"separators":true}},"align":"center","style":[{"background":"#74C7AB"},{"background":"#ABDEAF"},{"background":"#A3DAAD"},{"background":"#FFFFFF"},{"background":"#67C2AB"},{"background":"#7BCAAB"},{"background":"#A9DDAE"},{"background":"#ECF9CE"},{"background":"#76C8AB"},{"background":"#35B0AB"},{"background":"#9AD6AC"}]}],"defaultPageSize":11,"paginationType":"numbers","showPageInfo":true,"minRows":1,"striped":true,"compact":true,"dataKey":"acfa6ebc98889a0a2538b51a293f62c2","key":"acfa6ebc98889a0a2538b51a293f62c2"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+
+<!--/html_preserve-->

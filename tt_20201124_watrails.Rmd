@@ -3,6 +3,7 @@ title: "Tidy Tuesday 11/24/2020 Washington Trails"
 author: "greg dubrow"
 date: "11/24/2020"
 output: md_document
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
