@@ -2,7 +2,7 @@
 title: "Tidy Tuesday 11/24/2020 Washington Trails"
 author: "greg dubrow"
 date: "11/24/2020"
-output: md_document
+output: html_document
 always_allow_html: true
 ---
 
@@ -244,7 +244,8 @@ byregion %>%
 div(class = "region",
     div(class = "example-header",
         div(class = "title", 
-            "Averages by Trail Region"),
+            h2("Averages by Trail Region")),
+        # the table, from the saved object
         tbl_region
     )
 )
