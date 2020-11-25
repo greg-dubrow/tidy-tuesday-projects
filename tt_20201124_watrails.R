@@ -147,11 +147,38 @@ byregion <-  tt_watraildf %>%
 # create table
 byregion %>%
   gt() %>%
+  fmt_number(columns = vars(avggain, avghigh, minhigh, maxhigh), decimals = 0, use_seps = TRUE) %>%
+  # sets the columns and palette to format cell color by value range
   data_color(
-    columns = vars(avglength, avgrating, avggain, avghigh),
+    columns = vars(avglength, avgrating, avggain, avghigh, minhigh, maxhigh),
     colors = scales::col_numeric(
       palette = c("#ffffff", "#f2fbd2", "#c9ecb4", "#93d3ab", "#35b0ab"),
-      domain = NULL)) 
+      domain = NULL)) %>%
+  # tab_style calls add border boxes first to column labels, then body cells
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = "all", color = "grey", weight = px(1))),
+    locations = list(
+      cells_column_labels(
+        columns = gt::everything()
+        ))) %>%
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = "all", color = "grey", weight = px(1))),
+    locations = list(
+      cells_body(
+        rows = gt::everything()
+      ))) %>%
+  tab_header(title = "Regional Averages",
+             subtitle = md("_North Cascades have longest trails, 
+                           all mountain areas have lots of gain and highest points_")) %>%
+  cols_align(columns = TRUE, align = "center") %>%
+  cols_align(columns = "location_region", align = "left") %>%
+  cols_label(location_region = "Region", n_region = "N", avglength = "Avg Length (miles)",
+             avgrating = "Avg Rating", avggain = "Avg Gain (ft)",avghigh = "Avg Highpoint",
+             minhigh = "Lowest high point", maxhigh = "Max high point")
 
 ## reactable table
 ## create color palate objects for conidtional cell colors

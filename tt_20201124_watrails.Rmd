@@ -2,8 +2,8 @@
 title: "Tidy Tuesday 11/24/2020 Washington Trails"
 author: "greg dubrow"
 date: "11/24/2020"
-output: html_document
-always_allow_html: true
+output: md_document
+#always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
@@ -20,8 +20,7 @@ library(tidytuesdayR) # to load tidytuesday data
 library(tidyverse) # to do tidyverse things
 library(tidylog) # to get a log of what's happening to the data
 library(patchwork) # stitch plots together
-library(reactable) # pretty tables
-library(htmltools) # help with pretty tables
+library(gt) # lets make tables
 library(RColorBrewer) # colors!
 library(scales) # format chart output
 ```
@@ -148,105 +147,69 @@ tt_watraildf %>%
 
 ### Now that we see how the length, gain, highpoint & ratings spread out, I want build a table to see the averages by region. 
 
-I've been wanting to take a deeper dive on [gt](https://gt.rstudio.com/) & [reactable](https://glin.github.io/reactable/). So inspired by [Thomas Mock's reacable primer](https://themockup.blog/posts/2020-05-13-reactable-tables-the-rest-of-the-owl), a basic table with heatmap-like formatting for some columns. Since I'm mostly recreating Thomas' table (but with different data) I won't comment to much code. See his explainer for details.
+I've been wanting to take a deeper dive into [gt](https://gt.rstudio.com/) & [reactable](https://glin.github.io/reactable/). Since I'm doing this as a markdown doc & not HTML, I'll output using gt here. I've got some basic gt calls down, this excercise is all about conditionally formatting columns based on value. So inspired by [Thomas Mock's gt primer](https://themockup.blog/posts/2020-05-16-gt-a-grammer-of-tables), a basic table with heatmap-like formatting for some columns. See his explainer for details on the code, and for more features than I'm including.
 ```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = FALSE, warning=FALSE, message = FALSE, error= FALSE }
-
-## create color palates for conidtional cell colors
-
-make_color_pal <- function(colors, bias = 1) {
-  get_color <- colorRamp(colors, bias = bias)
-  function(x) rgb(get_color(x), maxColorValue = 255)
-}
-good_color <- make_color_pal(c("#ffffff", "#f2fbd2", "#c9ecb4", "#93d3ab", "#35b0ab"), bias = 2)
-
-# data frame with averages by region
+# create by region averages df
 byregion <-  tt_watraildf %>%
   distinct(name, .keep_all = TRUE) %>%
   group_by(location_region) %>%
   summarise(n_region = n(),
-    avglength = mean(length_miles),
-    avgrating = mean(rating),
-    avggain = mean(gain),
-    avghigh = mean(highpoint),
-    minhigh = min(highpoint),
-    maxhigh = max(highpoint)) %>%
+            avglength = mean(length_miles),
+            avgrating = mean(rating),
+            avggain = mean(gain),
+            avghigh = mean(highpoint),
+            minhigh = min(highpoint),
+            maxhigh = max(highpoint)) %>%
   mutate_at(vars(avglength:avgrating), round, 2) %>%
   mutate_at(vars(avggain:avghigh), round, 0) 
 
-# build the table and store as an object 
-tbl_region <-
+# create table
 byregion %>%
-  reactable(pagination = FALSE, compact = TRUE, 
-            borderless = FALSE, striped = TRUE,
-            columns = list(
-              location_region = colDef(name = "Region"),
-              n_region = colDef(name = "N"),
-              avglength = colDef(
-                name = "Avg Length (miles) ", align = "center",
-                style = function(value) {
-                  value
-                  normalized <- (value - min(byregion$avglength)) /
-                    (max(byregion$avglength) - min(byregion$avglength))
-                  color <- good_color(normalized)
-                  list(background = color)
-                }), 
-              avgrating = colDef(
-                name = "Avg Rating", align = "center",
-                style = function(value) {
-                  value
-                  normalized <- (value - min(byregion$avgrating)) /
-                    (max(byregion$avgrating) - min(byregion$avgrating))
-                  color <- good_color(normalized)
-                  list(background = color)
-                }),
-              avggain = colDef(
-                name = "Avg Gain", align = "center",
-                format = colFormat(separators = TRUE),
-                style = function(value) {
-                  value
-                  normalized <- (value - min(byregion$avggain)) /
-                    (max(byregion$avggain) - min(byregion$avggain))
-                  color <- good_color(normalized)
-                  list(background = color)
-                }),
-              avghigh = colDef(
-                name = "Avg High Point", align = "center",
-                format = colFormat(separators = TRUE),
-                style = function(value) {
-                  value
-                  normalized <- (value - min(byregion$avghigh)) /
-                    (max(byregion$avghigh) - min(byregion$avghigh))
-                  color <- good_color(normalized)
-                  list(background = color)
-                }),
-              minhigh = colDef(
-                name = "Min High Point", align = "center",
-                format = colFormat(separators = TRUE),
-                style = function(value) {
-                  value
-                  normalized <- (value - min(byregion$minhigh)) /
-                    (max(byregion$minhigh) - min(byregion$minhigh))
-                  color <- good_color(normalized)
-                  list(background = color)
-                }),
-              maxhigh = colDef(
-                name = "Max High Point", align = "center",
-                format = colFormat(separators = TRUE),
-                style = function(value) {
-                  value
-                  normalized <- (value - min(byregion$maxhigh)) /
-                    (max(byregion$maxhigh) - min(byregion$maxhigh))
-                  color <- good_color(normalized)
-                  list(background = color)
-                })))
+  gt() %>%
+  fmt_number(columns = vars(avggain, avghigh, minhigh, maxhigh), decimals = 0, use_seps = TRUE) %>%
+  # sets the columns and palette to format cell color by value range
+  data_color(
+    columns = vars(avglength, avgrating, avggain, avghigh, minhigh, maxhigh),
+    colors = scales::col_numeric(
+      palette = c("#ffffff", "#f2fbd2", "#c9ecb4", "#93d3ab", "#35b0ab"),
+      domain = NULL)) %>%
+  # tab_style calls add border boxes first to column labels, then body cells
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = "all", color = "grey", weight = px(1))),
+    locations = list(
+      cells_column_labels(
+        columns = gt::everything()
+        ))) %>%
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = "all", color = "grey", weight = px(1))),
+    locations = list(
+      cells_body(
+        rows = gt::everything()
+      ))) %>%
+    cols_align(columns = TRUE, align = "center") %>%
+  cols_align(columns = "location_region", align = "left") %>%
+  tab_header(title = "Regional Averages",
+             subtitle = md("_North Cascades have longest trails, 
+                           all mountain areas have lots of gain and highest points_")) %>%
+  cols_label(location_region = "Region", n_region = "N", avglength = "Avg Length (miles)",
+             avgrating = "Avg Rating", avggain = "Avg Gain (ft)",avghigh = "Avg Highpoint",
+             minhigh = "Lowest high point", maxhigh = "Max high point")
+```
 
-# add title via CSS
-div(class = "region",
-    div(class = "example-header",
-        div(class = "title", 
-            h2("Averages by Trail Region")),
-        # the table, from the saved object
-        tbl_region
-    )
-)
+### And finally a couple of models to see what might affect a trail rating.
+
+First a simple linear model using length, gain, & highpoint to predict rating
+```{r echo = FALSE, warning=FALSE, message = FALSE, error= FALSE }
+
+# creat df with distinct observations for each trail 
+tt_watraildf_dist <- tt_watraildf %>%
+  distinct(name, .keep_all = TRUE)
+
+# run the regression, see the stats
+wtmodel1 <- lm(rating ~ length_miles + gain + highpoint, data = tt_watraildf_dist)
+summary(wtmodel1)
 ```
