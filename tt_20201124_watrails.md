@@ -85,6 +85,57 @@ a basic table with heatmap-like formatting for some columns. See his
 explainer for details on the code, and for more features than I’m
 including.
 
+    # create by region averages df
+    byregion <-  tt_watraildf %>%
+      distinct(name, .keep_all = TRUE) %>%
+      group_by(location_region) %>%
+      summarise(n_region = n(),
+                avglength = mean(length_miles),
+                avgrating = mean(rating),
+                avggain = mean(gain),
+                avghigh = mean(highpoint),
+                minhigh = min(highpoint),
+                maxhigh = max(highpoint)) %>%
+      mutate_at(vars(avglength:avgrating), round, 2) %>%
+      mutate_at(vars(avggain:avghigh), round, 0) 
+
+    # create table - code commented out so html doesn't show up in md output. 
+    # image saved from tt_20201124_watrails.r code
+    # byregion %>%
+    #   gt() %>%
+    #   fmt_number(columns = vars(avggain, avghigh, minhigh, maxhigh), decimals = 0, use_seps = TRUE) %>%
+      # sets the columns and palette to format cell color by value range
+      # data_color(
+      #   columns = vars(avglength, avgrating, avggain, avghigh, minhigh, maxhigh),
+      #   colors = scales::col_numeric(
+      #     palette = c("#ffffff", "#f2fbd2", "#c9ecb4", "#93d3ab", "#35b0ab"),
+      #     domain = NULL)) %>%
+      # tab_style calls add border boxes first to column labels, then body cells
+      # tab_style(
+      #   style = list(
+      #     cell_borders(
+      #       sides = "all", color = "grey", weight = px(1))),
+      #   locations = list(
+      #     cells_column_labels(
+      #       columns = gt::everything()
+      #       ))) %>%
+      # tab_style(
+      #   style = list(
+      #     cell_borders(
+      #       sides = "all", color = "grey", weight = px(1))),
+      #   locations = list(
+      #     cells_body(
+      #       rows = gt::everything()
+      #     ))) %>%
+      #   cols_align(columns = TRUE, align = "center") %>%
+      # cols_align(columns = "location_region", align = "left") %>%
+      # tab_header(title = "Regional Averages",
+      #            subtitle = md("_North Cascades have longest trails, 
+      #                          all mountain areas have lots of gain and highest points_")) %>%
+    #  cols_label(location_region = "Region", n_region = "N", avglength = "Avg Length (miles)",
+    #            avgrating = "Avg Rating", avggain = "Avg Gain (ft)",avghigh = "Avg Highpoint",
+    #             minhigh = "Lowest high point", maxhigh = "Max high point")
+
 ![](images/tt11242020_gtavgbyregion.png)
 
 ### And finally a couple of models to see what might affect a trail rating.

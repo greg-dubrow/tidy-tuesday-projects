@@ -147,7 +147,7 @@ tt_watraildf %>%
 ### Now that we see how the length, gain, highpoint & ratings spread out, I want build a table to see the averages by region. 
 
 I've been wanting to take a deeper dive into [gt](https://gt.rstudio.com/) & [reactable](https://glin.github.io/reactable/). Since I'm doing this as a markdown doc & not HTML, I'll output using gt here. I've got some basic gt calls down, this excercise is all about conditionally formatting columns based on value. So inspired by [Thomas Mock's gt primer](https://themockup.blog/posts/2020-05-16-gt-a-grammer-of-tables), a basic table with heatmap-like formatting for some columns. See his explainer for details on the code, and for more features than I'm including.
-```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = FALSE, warning=FALSE, message = FALSE, error= FALSE }
+```{r  echo = TRUE, warning=FALSE, message = FALSE, error= FALSE }
 # create by region averages df
 byregion <-  tt_watraildf %>%
   distinct(name, .keep_all = TRUE) %>%
