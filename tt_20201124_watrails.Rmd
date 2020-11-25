@@ -76,7 +76,7 @@ tt_watraildf <- tt_watrail$hike_data %>%
 
 ```
 
-### To get a sense of what the data look like, I'll run a few scatterplots to see how things cluster, if there are outliers, etc...
+### To get a sense of what the data look like, I'll run a few scatterplots to see how things cluster, if there are outliers or anything else especially noticable.
 I plotted length by gain, faceting by ratings groups and then by region. We do have to be careful with ratings, as they are user-generated and some trails have very few votes. 
 ```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = FALSE, warning=FALSE, message = FALSE, error= FALSE }
 tt_watraildf %>%

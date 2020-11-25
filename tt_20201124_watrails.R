@@ -73,6 +73,26 @@ tt_watraildf %>%
   count(rating_grp, rating) %>%
   view()
 
+# exploratory scatterplots
+tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  ggplot(aes(length_miles, gain)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Length (miles)", y = "Total Gain",
+       title = "Length v Gain, by Rating Group") +
+  facet_wrap(vars(rating_grp))
+
+tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  ggplot(aes(length_miles, gain)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Length (miles)", y = "Total Gain",
+       title = "Length v Gain, by Region") +
+  facet_wrap(vars(location_region))
+
+
 ### reactable tables
 ## create color palates for conidtional cell colors
 

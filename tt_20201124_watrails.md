@@ -48,30 +48,17 @@
     #> mutate: new variable 'feature_type' (character) with 2 unique values and 0% NA
     #> select: columns reordered (name, location_region, location_specific, trail_type, length_miles, …)
 
-### To get a sense of what the data look like, I’ll run a few scatterplots to see how things cluster, if there are outliers, etc…
+### To get a sense of what the data look like, I’ll run a few scatterplots to see how things cluster, if there are outliers or anything else especially noticable.
 
 I plotted length by gain, faceting by ratings groups and then by region.
 We do have to be careful with ratings, as they are user-generated and
 some trails have very few votes.
-
-    #> distinct: removed 6,916 rows (79%), 1,858 rows remaining
-    #> `geom_smooth()` using method = 'loess' and formula 'y ~ x'
-
-<img src="images/unnamed-chunk-3-1.png" width="100%" />
-
-    #> distinct: removed 6,916 rows (79%), 1,858 rows remaining
-    #> `geom_smooth()` using method = 'loess' and formula 'y ~ x'
-
-<img src="images/unnamed-chunk-3-2.png" width="100%" />
+<img src="images/unnamed-chunk-3-1.png" width="100%" /><img src="images/unnamed-chunk-3-2.png" width="100%" />
 
 The outliers in terms of gain & length clustered in a few regions, so I
 wanted to see which they were. Not a surprise they clustered in the
 Cascades & Rainier.
 
-    #> distinct: removed 6,916 rows (79%), 1,858 rows remaining
-    #> filter: removed 1,853 rows (>99%), 5 rows remaining
-    #> filter: no rows removed
-    #> select: dropped 11 variables (location_specific, trail_type, highpoint, rating, rating_grp, …)
     #> # A tibble: 5 x 4
     #>   location_region    name                                     length_miles  gain
     #>   <chr>              <chr>                                           <dbl> <dbl>
