@@ -8,8 +8,7 @@
     library(scales) # format chart output
     library(lubridate) # dates!
 
-First let’s read in the file using the tidytuesdayR package. We’ll also look at the raw data
---------------------------------------------------------------------------------------------
+### First let’s read in the file using the tidytuesdayR package. We’ll also look at the raw data
 
     #> 
     #>  Downloading file 1 of 1: `hike_data.rds`
@@ -51,12 +50,21 @@ First let’s read in the file using the tidytuesdayR package. We’ll also look
 
 ### To get a sense of what the data look like, I’ll run a few scatterplots to see how things cluster, if there are
 
-### outliers, etc…
+### outliers, etc…I plotted length by gain, faceting by ratings groups. We do have to be careful with ratings, as the \#\#\# are user-generated and some trails have very few votes.
+
+    #> distinct: removed 6,916 rows (79%), 1,858 rows remaining
+    #> `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+<img src="images/unnamed-chunk-3-1.png" width="100%" /> \#\#\# The
+outliers in terms of gain & length clustered in a few regions, so I
+wanted to see which they were. Not a surprise they clustered in the
+Cascades & Rainier.
+
+    #> distinct: removed 6,916 rows (79%), 1,858 rows remaining
+    #> filter: removed 1,853 rows (>99%), 5 rows remaining
+    #> filter: no rows removed
+    #> select: dropped 11 variables (location_specific, trail_type, highpoint, rating, rating_grp, …)
 
     #> `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-<img src="images/unnamed-chunk-3-1.png" width="100%" />
-
-    #> `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
-
-<img src="images/unnamed-chunk-3-2.png" width="100%" />
+<img src="images/unnamed-chunk-5-1.png" width="100%" />

@@ -180,10 +180,34 @@ tt_watraildf %>%
   gt()
 
 tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
   ggplot(aes(length_miles, gain)) +
   geom_point() +
   geom_smooth() +
+  labs(x = "Length (miles)", y = "Total Gain",
+       title = "Length v Gain, by Rating Group") +
   facet_wrap(vars(rating_grp))
+
+tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  filter(gain < 10000) %>%
+  ggplot(aes(length_miles, gain)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Length (miles)", y = "Total Gain (feet)",
+       title = "Length v Gain, by Rating Group",
+       subtitle = "filter out gain > 10K ft (10 obs)") +
+  facet_wrap(vars(rating_grp))
+
+tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  # filter(location_region %in% c("Central Cascades" , "North Cascades",
+  #                               "Southwest Washington")) %>%
+  filter(gain > 15000) %>%
+  filter(length_miles > 90) %>%
+  select(location_region, name, length_miles, gain) %>%
+  arrange(name) %>%
+  view()
 
 tt_watraildf %>%
   ggplot(aes(highpoint, gain)) +

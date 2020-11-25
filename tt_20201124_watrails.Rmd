@@ -25,7 +25,7 @@ library(scales) # format chart output
 library(lubridate) # dates!
 ```
 
-## First let's read in the file using the tidytuesdayR package. We'll also look at the raw data
+### First let's read in the file using the tidytuesdayR package. We'll also look at the raw data
 ```{r echo = FALSE, message=FALSE}
 tt_watrail <- tt_load("2020-11-24")
 
@@ -77,14 +77,31 @@ tt_watraildf <- tt_watrail$hike_data %>%
 ```
 
 ### To get a sense of what the data look like, I'll run a few scatterplots to see how things cluster, if there are 
-### outliers, etc...
-```{r echo = FALSE, warning=FALSE }
-
+### outliers, etc...I plotted length by gain, faceting by ratings groups. We do have to be careful with ratings, as the ### are user-generated and some trails have very few votes. 
+```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = FALSE, warning=FALSE }
 tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
   ggplot(aes(length_miles, gain)) +
   geom_point() +
   geom_smooth() +
+  labs(x = "Length (miles)", y = "Total Gain",
+       title = "Length v Gain, by Rating Group") +
   facet_wrap(vars(rating_grp))
+```
+### The outliers in terms of gain & length clustered in a few regions, so I wanted to see which they were. Not a surprise they clustered in the Cascades & Rainier.
+```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = FALSE, warning=FALSE }
+tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  filter(gain > 15000) %>%
+  filter(length_miles > 90) %>%
+  select(location_region, name, length_miles, gain) %>%
+  arrange(name) %>%
+  view()
+```
+
+
+
+```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = FALSE, warning=FALSE }
 
 tt_watraildf %>%
   ggplot(aes(highpoint, gain)) +
