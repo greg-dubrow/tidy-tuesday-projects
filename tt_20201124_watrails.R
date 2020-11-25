@@ -7,6 +7,7 @@ library(gt)
 library(reactable)
 library(htmltools)
 library(patchwork)
+library(webshot)
 
 # reactable code-thru example at https://themockup.blog/posts/2020-05-13-reactable-tables-the-rest-of-the-owl
 
@@ -178,7 +179,8 @@ byregion %>%
   cols_align(columns = "location_region", align = "left") %>%
   cols_label(location_region = "Region", n_region = "N", avglength = "Avg Length (miles)",
              avgrating = "Avg Rating", avggain = "Avg Gain (ft)",avghigh = "Avg Highpoint",
-             minhigh = "Lowest high point", maxhigh = "Max high point")
+             minhigh = "Lowest high point", maxhigh = "Max high point") %>%
+  gtsave("images/tt11242020_gtavgbyregion.png")
 
 ## reactable table
 ## create color palate objects for conidtional cell colors
