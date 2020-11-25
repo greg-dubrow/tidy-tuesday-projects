@@ -219,7 +219,8 @@ tt_watraildf %>%
   view()
 
 tt_watraildf %>%
-  ggplot(aes(highpoint, gain)) +
+  distinct(name, .keep_all = TRUE) %>%
+  ggplot(aes(gain, highpoint)) +
   geom_point() +
   geom_smooth() +
   facet_wrap(vars(rating_grp))
@@ -230,13 +231,29 @@ tt_watraildf %>%
   corrr::correlate() %>%
   corrr::rplot(print_cor = TRUE) 
 
-wtmodel1 <- lm(rating ~ length_miles + gain + highpoint, data = tt_watraildf)
+tt_watraildf_dist <- tt_watraildf %>%
+  distinct(name, .keep_all = TRUE)
+  
+wtmodel1 <- lm(rating ~ length_miles + gain + highpoint, data = tt_watraildf_dist)
 summary(wtmodel1)
 
+#wtmodel2 <- 
 tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
   nest_by(location_region) %>%
   mutate(wtmodel1 = list(lm(rating ~ length_miles + gain + highpoint, data = data))) %>%
-  pull(wtmodel, name = )
+  pull(wtmodel1, name = location_region) %>%
+  map_dfr(~broom::tidy(.x) %>%
+            filter(term %in% c("length_miles", "gain", "highpoint")), .id = "location_region") %>%
+ # mutate(estx100 = estimate * 100) %>%
+  ggplot(aes(term, estimate)) + 
+  ggalt::geom_lollipop() +
+#  geom_text(aes(label = round(estx100, 2)), color = "white") +
+  geom_text(aes(label = paste0("p = ", round(p.value, 3))), color = "black", size = 3,
+            y = 0.01, vjust = 1.25) +
+  labs(y = expression(beta), x = "Trail measurement") +
+  coord_flip() +
+  facet_wrap(vars(location_region))
 
 
 
