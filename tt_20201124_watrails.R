@@ -190,6 +190,15 @@ tt_watraildf %>%
 
 tt_watraildf %>%
   distinct(name, .keep_all = TRUE) %>%
+  ggplot(aes(length_miles, gain)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Length (miles)", y = "Total Gain",
+       title = "Length v Gain, by Region") +
+  facet_wrap(vars(location_region))
+
+tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
   filter(gain < 10000) %>%
   ggplot(aes(length_miles, gain)) +
   geom_point() +
