@@ -48,6 +48,8 @@ Read in raw data, get it ready for analysis
       mutate(inspect_years = inspect_daysn/ 365.25) %>%
       mutate(inspect_months = inspect_daysn / 30.417)
 
+### First few charts look at bridges built by decade, the condition of all bridges by county, and how long since last inspection
+
     tt_baltdf %>% 
       mutate(county = str_replace(county, " County", "")) %>%
       count(decade_built) %>%

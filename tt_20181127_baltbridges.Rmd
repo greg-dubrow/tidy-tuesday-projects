@@ -64,9 +64,9 @@ tt_baltdf <- as.data.frame(tt_balt_gh) %>%
   mutate(inspect_daysn = as.numeric(inspect_days)) %>%
   mutate(inspect_years = inspect_daysn/ 365.25) %>%
   mutate(inspect_months = inspect_daysn / 30.417)
-
 ```
 
+### First few charts look at bridges built by decade, the condition of all bridges by county, and how long since last inspection
 
 ```{r tt_baltbr01, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 tt_baltdf %>% 
