@@ -7,22 +7,17 @@ library(RColorBrewer)
 library(scales)
 library(lubridate)
 
-today <- Sys.Date()
-today_yr <- as.numeric(format(today, format="%Y"))
 
 ## lists available sets in the viewer
 tt_available()
 
 
 # load balt bridge object via tidy tuesdayR
-# tt_balt1 <- tt_load("2018-11-27")
+# tt_balt1 <- tt_load_gh("2018-11-27")
+# tt_balt_df1 <- tt_download_file(tt_balt1, "baltimore_bridges.csv")
+# 
+# glimpse(tt_balt1)
 
-readme(tt_balt1)
-ls(tt_balt1)
-
-tt_balt_gh <- tt_load_gh("2018-11-27")
-# convert to df
-#tt_baltdf1 <- as.data.frame(tt_balt1["baltimore_bridges"]) 
 
 # read in from github repo
 # create decade of bridge built, age of bridge relative to current, fix county
@@ -31,8 +26,15 @@ tt_balt_gh <- tt_load_gh("2018-11-27")
 # in dplyr chain 
 # rename_at(vars(starts_with("baltimore_bridges.")), funs(str_replace(., "baltimore_bridges.", "")))
 
-tt_baltdf <- as.data.frame(tt_balt_gh %>%
-  tt_read_data("baltimore_bridges.csv")) %>%
+# keeping date March 21 when I did analysis
+today <- as.Date(c("2020-03-21"))
+#Sys.Date()
+today_yr <- as.numeric(format(today, format="%Y"))
+
+tt_balt_gh <-
+read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-11-27/baltimore_bridges.csv",
+         progress = show_progress())
+tt_baltdf <- as.data.frame(tt_balt_gh) %>%
   mutate(age = today_yr - yr_built) %>%
   #  mutate(vehicles_n = as.numeric(str_remove(vehicles, " vehicles")))
   ## not needed, avg_daily_traffic has same info

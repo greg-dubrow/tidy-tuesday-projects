@@ -2,7 +2,7 @@
 title: "Tidy Tuesday Baltimore Bridges"
 author: "greg dubrow"
 date: "3/21/2020"
-output: html_document
+output: md_document
 ---
 
 ```{r setup, include=FALSE}
@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
   out.width = "100%") 
 ```
 
-```{r pkg load, message=FALSE, ECHO = FALSE}
+```{r pkg load, message=FALSE, ECHO = TRUE}
 # readin in data, create df for plots
 library(tidytuesdayR) # to load tidytuesday data
 library(tidyverse) # to do tidyverse things
@@ -23,24 +23,17 @@ library(scales) # format chart output
 library(lubridate) # dates!
 ```
 
-```{r echo FALSE}
-today <- Sys.Date()
+Read in raw data, get it ready for analysis
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+today <- as.Date(c("2020-03-21"))
+#Sys.Date()
 today_yr <- as.numeric(format(today, format="%Y"))
 
-tt_balt_gh <- tt_load_gh("2018-11-27")
 
-# convert to df
-#tt_baltdf1 <- as.data.frame(tt_balt1["baltimore_bridges"]) 
+tt_balt_gh <-
+read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-11-27/baltimore_bridges.csv")
 
-# read in from github repo
-# create decade of bridge built, age of bridge relative to current, fix county
-# remove prefix from col names
-# colnames(tt_baltdf) <- sub("baltimore_bridges.", "", names(tt_baltdf), fixed = TRUE)
-# in dplyr chain 
-# rename_at(vars(starts_with("baltimore_bridges.")), funs(str_replace(., "baltimore_bridges.", "")))
-
-tt_baltdf <- as.data.frame(tt_balt_gh %>%
-  tt_read_data("baltimore_bridges.csv")) %>%
+tt_baltdf <- as.data.frame(tt_balt_gh) %>%
   mutate(age = today_yr - yr_built) %>%
   #  mutate(vehicles_n = as.numeric(str_remove(vehicles, " vehicles")))
   ## not needed, avg_daily_traffic has same info
@@ -75,7 +68,7 @@ tt_baltdf <- as.data.frame(tt_balt_gh %>%
 ```
 
 
-```{r message = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 tt_baltdf %>% 
   mutate(county = str_replace(county, " County", "")) %>%
   count(decade_built) %>%
@@ -88,7 +81,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r message = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## percent bridge condition by county
 # need to create df object to do subset label call in bar chart
 brcondcty <- 
@@ -111,7 +104,7 @@ ggplot(brcondcty, aes(x = county, y = pct, fill = bridge_condition)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r message = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## median age of bridges by county
 tt_baltdf %>%
   group_by(county) %>%
@@ -128,7 +121,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r message = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 
 ## median months since last inspection by county
 tt_baltdf %>%
@@ -146,7 +139,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r message = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## median & interquartile months since last inspection by county
 tt_baltdf %>%
   group_by(county) %>%
@@ -170,7 +163,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r message = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## age by months since last inspection
 tt_baltdf %>%
   ggplot(aes(inspect_months, age)) +
@@ -181,7 +174,7 @@ tt_baltdf %>%
   theme_minimal()
 ```
 
-```{r message = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
  # same but outliers removed
 tt_baltdf %>%
   filter(age <150, inspect_months <60) %>%
@@ -194,7 +187,7 @@ tt_baltdf %>%
   theme_minimal()
 ```
 
-```{r message = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## age by months since last inspection, by county
 tt_baltdf %>%
   ggplot(aes(inspect_months, age, color = county)) +
@@ -210,7 +203,7 @@ tt_baltdf %>%
         legend.margin = margin(6, 6, 6, 6))
 ```
 
-```{r message = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## median of daily riders of bridges by county - 
     # note reorder w/out - before y to sort by top avgtraf
 tt_baltdf %>%
@@ -228,7 +221,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r message = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 # median & interquartiles of daily riders of bridges by county -
 tt_baltdf %>%
   group_by(county) %>%
@@ -252,7 +245,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r message = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## age by avg daily riders by county
 tt_baltdf %>%
   ggplot(aes(avg_daily_traffic, age, color = county)) +
