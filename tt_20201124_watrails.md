@@ -262,9 +262,9 @@ dog-free trails do get the highest ratings, it’s likely because they’re
 the highest, so offer views and challenge and get good ratings.
 ![](images/tt11242020_gtavgbyfeature.png)
 
-### And finally a couple of models to see what might affect a trail rating.
+### And finally a quick model to see what might affect a trail rating.
 
-First a simple linear model using length, gain, highpoint, & number of
+It’s a simple linear model using length, gain, highpoint, & number of
 features to predict rating. The elevation of the highest point and
 number of features are both significant. I’d need to do more digging to
 see what the power of the estimate is on the rating. It’s also slightly
