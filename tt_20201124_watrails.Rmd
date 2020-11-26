@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
   out.width = "100%") 
 ```
 
-```{r pkg load, message=FALSE, ECHO = FALSE}
+```{r pkg load, message=FALSE, ECHO = TRUE}
 # readin in data, create df for plots
 library(tidytuesdayR) # to load tidytuesday data
 library(tidyverse) # to do tidyverse things
@@ -90,7 +90,7 @@ tt_watraildf <- tt_watrail$hike_data %>%
 
 ### To get a sense of what the data look like, I'll run some historgrams and scatterplots to see how things cluster, if there are outliers or anything else especially noticable.
 Using log10 for the length scale to even out the spread. [Patchwork](https://patchwork.data-imaginist.com/) stitches the plots together in a neat panel.
-```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = FALSE, warning=FALSE, message = FALSE, error= FALSE }
+```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE }
 hist_length <-
 tt_watraildf %>%
   distinct(name, .keep_all = TRUE) %>%

@@ -89,6 +89,37 @@
 Using log10 for the length scale to even out the spread.
 [Patchwork](https://patchwork.data-imaginist.com/) stitches the plots
 together in a neat panel.
+
+    hist_length <-
+    tt_watraildf %>%
+      distinct(name, .keep_all = TRUE) %>%
+      ggplot(aes(length_miles)) +
+      geom_histogram(alpha = 0.8) +
+      scale_x_log10() +
+      labs(x = "Length (miles), log10")
+
+    hist_gain <-
+      tt_watraildf %>%
+      distinct(name, .keep_all = TRUE) %>%
+      ggplot(aes(gain)) +
+      geom_histogram(alpha = 0.8) +
+      scale_x_log10()
+
+    hist_high <-
+      tt_watraildf %>%
+      distinct(name, .keep_all = TRUE) %>%
+      ggplot(aes(highpoint)) +
+      geom_histogram(alpha = 0.8) 
+
+    hist_rate <-
+      tt_watraildf %>%
+      distinct(name, .keep_all = TRUE) %>%
+      ggplot(aes(rating)) +
+      geom_histogram(alpha = 0.8) 
+
+    (hist_length | hist_gain) /
+      (hist_high | hist_rate)
+
 <img src="images/unnamed-chunk-3-1.png" width="100%" /> For the
 scatterplots, I plotted length by gain, faceting by ratings groups and
 then by region. We do have to be careful with ratings, as they are
