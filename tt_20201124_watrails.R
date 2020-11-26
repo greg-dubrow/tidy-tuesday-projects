@@ -20,9 +20,10 @@ readme(tt_watrail)
 
 
 ### change object to dataframe, start cleaning & prepping
-# 1) create columns for miles, direction, type from length
-# 2) create specific location columns frolm location
-# 3) change rafing, gain and highpoint to numeric
+#  create columns for miles, direction, type from length
+#  create specific location columns frolm location
+#  change rating, gain and highpoint to numeric
+#  change features to character vector, also unnest and leave with long df *use distinct=name for some analysis
 tt_watraildf <- tt_watrail$hike_data %>%
   mutate(length_miles = parse_number(length)) %>%
   mutate(across(gain:rating, as.numeric)) %>%
@@ -37,25 +38,38 @@ tt_watraildf <- tt_watrail$hike_data %>%
                           grepl("of trails", length) ~ "Trails")) %>% 
   mutate(location_split = location) %>%
   separate(location_split, c("location_region","location_specific"), sep = ' -- ') %>%
-  unnest(cols = c(features)) %>% 
-  mutate(feature_init = case_when(features == "Dogs allowed on leash" ~ "DA",
-                                  features == "Dogs not allowed" ~ "DN",
-                                  features == "Wildlife" ~ "Wl",
-                                  features == "Good for kids" ~ "GK",
-                                  features == "Lakes" ~ "Lk",
-                                  features == "Fall foliage" ~ "FF",
-                                  features == "Ridges/passes" ~ "RP",
-                                  features == "Established campsites" ~ "EC",
-                                  features == "Mountain views" ~ "MV",
-                                  features == "Old growth" ~ "OG",
-                                  features == "Waterfalls" ~ "Wf",
-                                  features == "Wildflowers/Meadows" ~ "WM",
-                                  features == "Rivers" ~ "Ri",
-                                  features == "Coast" ~ "Co",
-                                  features == "Summits" ~ "Su")) %>%
+  mutate(features = lapply(features, sort, na.last = TRUE)) %>%
+  mutate(feature_v = sapply(features,FUN = function(x) if (all(is.na(x))) NA else paste(x,collapse = ", "))) %>%
+  mutate(feature_v = str_trim(feature_v)) %>%
+  mutate(features_unnest = features) %>%
+  unnest(cols = c(features_unnest), keep_empty = TRUE) %>% 
+  mutate(feature_v = ifelse(is.na(feature_v), "none", feature_v)) %>%
+  mutate(features_unnest = ifelse(is.na(features_unnest), "none", features_unnest)) %>%
+  mutate(feature_init = case_when(features_unnest == "Dogs allowed on leash" ~ "DA",
+                                  features_unnest == "Dogs not allowed" ~ "DN",
+                                  features_unnest == "Wildlife" ~ "Wl",
+                                  features_unnest == "Good for kids" ~ "GK",
+                                  features_unnest == "Lakes" ~ "Lk",
+                                  features_unnest == "Fall foliage" ~ "FF",
+                                  features_unnest == "Ridges/passes" ~ "RP",
+                                  features_unnest == "Established campsites" ~ "EC",
+                                  features_unnest == "Mountain views" ~ "MV",
+                                  features_unnest == "Old growth" ~ "OG",
+                                  features_unnest == "Waterfalls" ~ "Wf",
+                                  features_unnest == "Wildflowers/Meadows" ~ "WM",
+                                  features_unnest == "Rivers" ~ "Ri",
+                                  features_unnest == "Coast" ~ "Co",
+                                  features_unnest == "Summits" ~ "Su")) %>%
+  mutate(feature_init = ifelse(is.na(feature_init), "none", feature_init)) %>%
   mutate(feature_type = if_else(feature_init %in% c("DA","DN","GK"), "Companion", "Feature")) %>%
+  mutate(feature_type = ifelse(feature_init == "none", "none", feature_type)) %>%
+  group_by(name) %>%
+  mutate(feature_n = n()) %>%
+  ungroup() %>%
+  mutate(feature_n = ifelse(feature_init == "none", 0, feature_n)) %>%
   select(name, location_region, location_specific, trail_type, length_miles, 
-         gain, highpoint, rating, rating_grp, features, feature_init, feature_type, description, location, length)
+         gain, highpoint, rating, rating_grp, features, feature_v, features_unnest, 
+         feature_init, feature_type, feature_n, description, location, length)
 
 ### other less optimal but worth saving approaches to some of the above fields
 #  mutate(length_miles = as.numeric(str_extract(length, "^[^\\s]+"))) %>%
@@ -64,7 +78,6 @@ tt_watraildf <- tt_watrail$hike_data %>%
 # mutate(length_dir = str_extract(length_txt, '\\b[^,]+$')) %>%
 #mutate(location_region = str_extract(location, '\\b[^--]+$')) %>%
 #mutate(location_region = gsub("(.*)\\s[-][-].*","\\1",location)) %>%
-
 
 glimpse(tt_watraildf)
 
@@ -271,6 +284,78 @@ div(class = "region",
     )
 )
 
+
+## features
+tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  count(feature_n)
+
+tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  count(features_unnest) %>%
+  arrange(desc(n))
+
+tt_watraildf %>%
+  distinct(name, .keep_all = TRUE) %>%
+  ggplot(aes(feature_n, rating)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "# of features on a trail", y = "User rating",
+       title = "Features and Rating by Trail Region") +
+  facet_wrap(vars(location_region))
+
+byfeature <- 
+tt_watraildf %>%
+  group_by(features_unnest) %>%
+  summarise(n_feature = n(),
+            avgrating = mean(rating),
+            avglength = mean(length_miles),
+            avggain = mean(gain),
+            avghigh = mean(highpoint),
+            minhigh = min(highpoint),
+            maxhigh = max(highpoint)) %>%
+  mutate_at(vars(avglength:avgrating), round, 2) %>%
+  mutate_at(vars(avggain:avghigh), round, 0) %>%
+  arrange(desc(avgrating))
+
+# create table
+byfeature %>%
+  gt() %>%
+  fmt_number(columns = vars(n_feature, avggain, avghigh, minhigh, maxhigh), decimals = 0, use_seps = TRUE) %>%
+  # sets the columns and palette to format cell color by value range
+  data_color(
+    columns = vars(avglength, avgrating, avggain, avghigh, minhigh, maxhigh),
+    colors = scales::col_numeric(
+      palette = c("#ffffff", "#f2fbd2", "#c9ecb4", "#93d3ab", "#35b0ab"),
+      domain = NULL)) %>%
+  # tab_style calls add border boxes first to column labels, then body cells
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = "all", color = "grey", weight = px(1))),
+    locations = list(
+      cells_column_labels(
+        columns = gt::everything()
+      ))) %>%
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = "all", color = "grey", weight = px(1))),
+    locations = list(
+      cells_body(
+        rows = gt::everything()
+      ))) %>%
+  tab_header(title = "Averages by Feature",
+             subtitle = md("_Dog-free trails with waterfalls & high peaks earn high ratings_")) %>%
+  cols_align(columns = TRUE, align = "center") %>%
+  cols_align(columns = "features_unnest", align = "left") %>%
+  cols_label(features_unnest = "Feature", n_feature = "Trails w/ Feature", avglength = "Avg Length (miles)",
+             avgrating = "Avg Rating", avggain = "Avg Gain (ft)",avghigh = "Avg Highpoint",
+             minhigh = "Lowest high point", maxhigh = "Max high point") %>%
+  gtsave("images/tt11242020_gtavgbyfeature.png")
+
+
+
 ## reactable table of averages by rating group
 tt_watraildf %>%
   group_by(rating_grp) %>%
@@ -332,14 +417,18 @@ tt_watraildf %>%
 
 
 tt_watraildf %>%
-  select(rating, length_miles, gain, highpoint) %>%
+  distinct(name, .keep_all = TRUE) %>%
+  select(rating, length_miles, gain, highpoint, feature_n) %>%
   corrr::correlate() %>%
   corrr::rplot(print_cor = TRUE) 
 
 tt_watraildf_dist <- tt_watraildf %>%
-  distinct(name, .keep_all = TRUE)
-  
-wtmodel1 <- lm(rating ~ length_miles + gain + highpoint, data = tt_watraildf_dist)
+  distinct(name, .keep_all = TRUE) %>%
+  mutate(lengthlog10 = log10(length_miles)) %>%
+  mutate(gainlog10 = log10(gain)) %>%
+  mutate(highlog10 = log10(highpoint))
+
+wtmodel1 <- lm(rating ~ length_miles + gain + highpoint + feature_n, data = tt_watraildf_dist)
 summary(wtmodel1)
 
 #wtmodel2 <- 

@@ -28,8 +28,9 @@
 -   create specific location columns frolm location
 -   change rating, gain and highpoint to numeric
 -   create a rating group
--   separate out features and make the resulting df long. we’ll use
-    distinct when we only need 1 obs per trail
+-   change features to character vector, also unnest; makes the
+    resulting df long. we’ll use distinct when we only need 1 obs per
+    trail
 
 <!-- -->
 
@@ -43,8 +44,20 @@
     #> Warning: Expected 2 pieces. Missing pieces filled with `NA` in 38 rows [34, 73,
     #> 271, 306, 537, 559, 599, 652, 672, 708, 718, 749, 799, 800, 835, 836, 889, 1014,
     #> 1033, 1100, ...].
-    #> mutate: new variable 'feature_init' (character) with 15 unique values and 0% NA
+    #> mutate: changed 1,683 values (86%) of 'features' (0 new NA)
+    #> mutate: new variable 'feature_v' (character) with 1,062 unique values and 3% NA
+    #> mutate: no changes
+    #> mutate: new variable 'features_unnest' (list) with 1,062 unique values and 0% NA
+    #> mutate: changed 68 values (1%) of 'feature_v' (68 fewer NA)
+    #> mutate: changed 68 values (1%) of 'features_unnest' (68 fewer NA)
+    #> mutate: new variable 'feature_init' (character) with 16 unique values and 1% NA
+    #> mutate: changed 68 values (1%) of 'feature_init' (68 fewer NA)
     #> mutate: new variable 'feature_type' (character) with 2 unique values and 0% NA
+    #> mutate: changed 68 values (1%) of 'feature_type' (0 new NA)
+    #> group_by: one grouping variable (name)
+    #> mutate (grouped): new variable 'feature_n' (integer) with 15 unique values and 0% NA
+    #> ungroup: no grouping variables
+    #> mutate: converted 'feature_n' from integer to double (0 new NA)
     #> select: columns reordered (name, location_region, location_specific, trail_type, length_miles, …)
 
 ### To get a sense of what the data look like, I’ll run some historgrams and scatterplots to see how things cluster, if there are outliers or anything else especially noticable.
@@ -138,28 +151,54 @@ including.
 
 ![](images/tt11242020_gtavgbyregion.png)
 
+### Now let’s look at the effect of trail features on rating.
+
+First we’ll look at average rating by feature, then fit a model. First,
+a scatter-plot of number of features listed for a trail with user
+rating. Looks like at a certain point, it’s diminshing returns on trail
+features in terms of effect on rating.
+<img src="images/unnamed-chunk-7-1.png" width="100%" />
+
+Here’s a table similar to the one for averages by region. I used the
+unnested features, so trails will be represented more than once. While
+dog-free trails do get the highest ratings, it’s likely because they’re
+the highest, so offer views and challenge and get good ratings.
+![](images/tt11242020_gtavgbyfeature.png)
+
 ### And finally a couple of models to see what might affect a trail rating.
 
-First a simple linear model using length, gain, & highpoint to predict
-rating
+First a simple linear model using length, gain, highpoint, & number of
+features to predict rating. The elevation of the highest point and
+number of features are both significant. I’d need to do more digging to
+see what the power of the estimate is on the rating. It’s also slightly
+counter-intuitive given that we saw in the charts that length, elevation
+and gain seem to positively affect rating. But then the model only
+accounts for 4% of varaince, so it’s not telling us much.
 
     #> 
     #> Call:
-    #> lm(formula = rating ~ length_miles + gain + highpoint, data = tt_watraildf_dist)
+    #> lm(formula = rating ~ length_miles + gain + highpoint + feature_n, 
+    #>     data = tt_watraildf_dist)
     #> 
     #> Residuals:
     #>     Min      1Q  Median      3Q     Max 
-    #> -3.3527 -0.3735  0.3506  0.9626  2.5779 
+    #> -3.6984 -0.3776  0.3716  0.9284  2.4565 
     #> 
     #> Coefficients:
     #>                Estimate Std. Error t value Pr(>|t|)    
-    #> (Intercept)   2.765e+00  6.531e-02  42.331  < 2e-16 ***
-    #> length_miles  1.477e-04  5.794e-03   0.025    0.980    
-    #> gain         -4.156e-05  3.191e-05  -1.303    0.193    
-    #> highpoint     8.268e-05  1.785e-05   4.631 3.89e-06 ***
+    #> (Intercept)   2.205e+00  8.942e-02  24.663  < 2e-16 ***
+    #> length_miles -6.565e-03  5.678e-03  -1.156    0.248    
+    #> gain         -3.590e-05  3.100e-05  -1.158    0.247    
+    #> highpoint     8.318e-05  1.742e-05   4.775 1.93e-06 ***
+    #> feature_n     1.272e-01  1.484e-02   8.576  < 2e-16 ***
     #> ---
     #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     #> 
-    #> Residual standard error: 1.412 on 1854 degrees of freedom
-    #> Multiple R-squared:  0.01242,    Adjusted R-squared:  0.01082 
-    #> F-statistic: 7.769 on 3 and 1854 DF,  p-value: 3.723e-05
+    #> Residual standard error: 1.398 on 1919 degrees of freedom
+    #> Multiple R-squared:  0.0488, Adjusted R-squared:  0.04682 
+    #> F-statistic: 24.61 on 4 and 1919 DF,  p-value: < 2.2e-16
+
+Plenty more to do with the set, and some responses I’ve seen have been
+creative…network graphs, better models…but I was able to brush up on gt,
+learned how to unnest and keep obs where the list was empty. So a
+successful \#tudytuesday
