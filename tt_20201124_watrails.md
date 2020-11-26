@@ -34,31 +34,52 @@
 
 <!-- -->
 
-    #> mutate: new variable 'length_miles' (double) with 277 unique values and 0% NA
-    #> mutate: converted 'gain' from character to double (0 new NA)
-    #>         converted 'highpoint' from character to double (0 new NA)
-    #>         converted 'rating' from character to double (0 new NA)
-    #> mutate: new variable 'rating_grp' (character) with 6 unique values and 0% NA
-    #> mutate: new variable 'trail_type' (character) with 3 unique values and 0% NA
-    #> mutate: new variable 'location_split' (character) with 61 unique values and 0% NA
-    #> Warning: Expected 2 pieces. Missing pieces filled with `NA` in 38 rows [34, 73,
-    #> 271, 306, 537, 559, 599, 652, 672, 708, 718, 749, 799, 800, 835, 836, 889, 1014,
-    #> 1033, 1100, ...].
-    #> mutate: changed 1,683 values (86%) of 'features' (0 new NA)
-    #> mutate: new variable 'feature_v' (character) with 1,062 unique values and 3% NA
-    #> mutate: no changes
-    #> mutate: new variable 'features_unnest' (list) with 1,062 unique values and 0% NA
-    #> mutate: changed 68 values (1%) of 'feature_v' (68 fewer NA)
-    #> mutate: changed 68 values (1%) of 'features_unnest' (68 fewer NA)
-    #> mutate: new variable 'feature_init' (character) with 16 unique values and 1% NA
-    #> mutate: changed 68 values (1%) of 'feature_init' (68 fewer NA)
-    #> mutate: new variable 'feature_type' (character) with 2 unique values and 0% NA
-    #> mutate: changed 68 values (1%) of 'feature_type' (0 new NA)
-    #> group_by: one grouping variable (name)
-    #> mutate (grouped): new variable 'feature_n' (integer) with 15 unique values and 0% NA
-    #> ungroup: no grouping variables
-    #> mutate: converted 'feature_n' from integer to double (0 new NA)
-    #> select: columns reordered (name, location_region, location_specific, trail_type, length_miles, …)
+    tt_watraildf <- tt_watrail$hike_data %>%
+      mutate(length_miles = parse_number(length)) %>%
+      mutate(across(gain:rating, as.numeric)) %>%
+      mutate(rating_grp = case_when(rating == 0 ~ "0",
+                                    rating >0 & rating < 2 ~ "1",
+                                    rating >=2 & rating < 3 ~ "2",
+                                    rating >=3 & rating < 4 ~ "3",
+                                    rating >=4 & rating < 5 ~ "4",
+                                    rating == 5 ~ "5")) %>%
+      mutate(trail_type = case_when(grepl("roundtrip", length) ~ "Round trip",
+                              grepl("one-way", length) ~ "One Way",
+                              grepl("of trails", length) ~ "Trails")) %>% 
+      mutate(location_split = location) %>%
+      separate(location_split, c("location_region","location_specific"), sep = ' -- ') %>%
+      mutate(features = lapply(features, sort, na.last = TRUE)) %>%
+      mutate(feature_v = sapply(features,FUN = function(x) if (all(is.na(x))) NA else paste(x,collapse = ", "))) %>%
+      mutate(feature_v = str_trim(feature_v)) %>%
+      mutate(features_unnest = features) %>%
+      unnest(cols = c(features_unnest), keep_empty = TRUE) %>% 
+      mutate(feature_v = ifelse(is.na(feature_v), "none", feature_v)) %>%
+      mutate(features_unnest = ifelse(is.na(features_unnest), "none", features_unnest)) %>%
+      mutate(feature_init = case_when(features_unnest == "Dogs allowed on leash" ~ "DA",
+                                      features_unnest == "Dogs not allowed" ~ "DN",
+                                      features_unnest == "Wildlife" ~ "Wl",
+                                      features_unnest == "Good for kids" ~ "GK",
+                                      features_unnest == "Lakes" ~ "Lk",
+                                      features_unnest == "Fall foliage" ~ "FF",
+                                      features_unnest == "Ridges/passes" ~ "RP",
+                                      features_unnest == "Established campsites" ~ "EC",
+                                      features_unnest == "Mountain views" ~ "MV",
+                                      features_unnest == "Old growth" ~ "OG",
+                                      features_unnest == "Waterfalls" ~ "Wf",
+                                      features_unnest == "Wildflowers/Meadows" ~ "WM",
+                                      features_unnest == "Rivers" ~ "Ri",
+                                      features_unnest == "Coast" ~ "Co",
+                                      features_unnest == "Summits" ~ "Su")) %>%
+      mutate(feature_init = ifelse(is.na(feature_init), "none", feature_init)) %>%
+      mutate(feature_type = if_else(feature_init %in% c("DA","DN","GK"), "Companion", "Feature")) %>%
+      mutate(feature_type = ifelse(feature_init == "none", "none", feature_type)) %>%
+      group_by(name) %>%
+      mutate(feature_n = n()) %>%
+      ungroup() %>%
+      mutate(feature_n = ifelse(feature_init == "none", 0, feature_n)) %>%
+      select(name, location_region, location_specific, trail_type, length_miles, 
+             gain, highpoint, rating, rating_grp, features, feature_v, features_unnest, 
+             feature_init, feature_type, feature_n, description, location, length)
 
 ### To get a sense of what the data look like, I’ll run some historgrams and scatterplots to see how things cluster, if there are outliers or anything else especially noticable.
 

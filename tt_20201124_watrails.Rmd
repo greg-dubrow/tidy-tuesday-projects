@@ -25,7 +25,7 @@ library(scales) # format chart output
 ```
 
 ### First let's read in the file using the tidytuesdayR package. We'll also look at the raw data
-```{r echo = FALSE, message=FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 tt_watrail <- tt_load("2020-11-24")
 
 glimpse(tt_watrail$hike_data)
@@ -38,7 +38,7 @@ glimpse(tt_watrail$hike_data)
   * create a rating group
   * change features to character vector, also unnest; makes the resulting df long. we'll use distinct when we only need 1 obs per trail
 
-```{r echo = FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 tt_watraildf <- tt_watrail$hike_data %>%
   mutate(length_miles = parse_number(length)) %>%
   mutate(across(gain:rating, as.numeric)) %>%
@@ -122,7 +122,7 @@ hist_rate <-
   (hist_high | hist_rate)
 ```
 For the scatterplots, I plotted length by gain, faceting by ratings groups and then by region. We do have to be careful with ratings, as they are user-generated and some trails have very few votes. Log10 used again for length.
-```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = FALSE, warning=FALSE, message = FALSE, error= FALSE }
+```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE }
 
 tt_watraildf %>%
   distinct(name, .keep_all = TRUE) %>%
