@@ -147,7 +147,7 @@ tt_watraildf %>%
 ```
 
 The outliers in terms of gain & length clustered in a few regions, so I wanted to see which they were. Not a surprise they clustered in the Cascades & Rainier.
-```{r echo = FALSE, warning=FALSE, message = FALSE, error= FALSE}
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 tt_watraildf %>%
   distinct(name, .keep_all = TRUE) %>%
   filter(gain > 15000) %>%
@@ -218,7 +218,7 @@ byregion <-  tt_watraildf %>%
 
 First we'll look at average rating by feature, then fit a model. 
 First, a scatter-plot of number of features listed for a trail with user rating. Looks like at a certain point, it's diminshing returns on trail features in terms of effect on rating.
-```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = FALSE, warning=FALSE, message = FALSE, error= FALSE }
+```{r fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE }
 
 tt_watraildf %>%
   distinct(name, .keep_all = TRUE) %>%
@@ -237,7 +237,7 @@ Here's a table similar to the one for averages by region. I used the unnested fe
 ### And finally a couple of models to see what might affect a trail rating.
 
 First a simple linear model using length, gain, highpoint, & number of features to predict rating. The elevation of the highest point and number of features are both significant. I'd need to do more digging to see what the power of the estimate is on the rating. It's also slightly counter-intuitive given that we saw in the charts that length, elevation and gain seem to positively affect rating. But then the model only accounts for 4% of varaince, so it's not telling us much. 
-```{r echo = FALSE, warning=FALSE, message = FALSE, error= FALSE }
+```{r echo = TRUE, warning=FALSE, message = FALSE, error= FALSE }
 
 # creat df with distinct observations for each trail 
 tt_watraildf_dist <- tt_watraildf %>%

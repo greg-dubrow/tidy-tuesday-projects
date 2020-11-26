@@ -9,8 +9,11 @@
 
 ### First let’s read in the file using the tidytuesdayR package. We’ll also look at the raw data
 
+    tt_watrail <- tt_load("2020-11-24")
     #> 
     #>  Downloading file 1 of 1: `hike_data.rds`
+
+    glimpse(tt_watrail$hike_data)
     #> Rows: 1,958
     #> Columns: 8
     #> $ name        <chr> "Lake Hills Greenbelt", "Snow Lake", "Skookum Flats", "Te…
@@ -91,12 +94,43 @@ scatterplots, I plotted length by gain, faceting by ratings groups and
 then by region. We do have to be careful with ratings, as they are
 user-generated and some trails have very few votes. Log10 used again for
 length.
-<img src="images/unnamed-chunk-4-1.png" width="100%" /><img src="images/unnamed-chunk-4-2.png" width="100%" />
+
+
+    tt_watraildf %>%
+      distinct(name, .keep_all = TRUE) %>%
+      ggplot(aes(length_miles, gain)) +
+      geom_point() +
+      geom_smooth() +
+      scale_x_log10() +
+      labs(x = "Length (miles) log10", y = "Total Gain",
+           title = "Length v Gain, by Rating Group") +
+      facet_wrap(vars(rating_grp))
+
+<img src="images/unnamed-chunk-4-1.png" width="100%" />
+
+
+    tt_watraildf %>%
+      distinct(name, .keep_all = TRUE) %>%
+      ggplot(aes(length_miles, gain)) +
+      geom_point() +
+      geom_smooth() +
+      scale_x_log10() +
+      labs(x = "Length (miles) log 10", y = "Total Gain",
+           title = "Length v Gain, by Region") +
+      facet_wrap(vars(location_region))
+
+<img src="images/unnamed-chunk-4-2.png" width="100%" />
 
 The outliers in terms of gain & length clustered in a few regions, so I
 wanted to see which they were. Not a surprise they clustered in the
 Cascades & Rainier.
 
+    tt_watraildf %>%
+      distinct(name, .keep_all = TRUE) %>%
+      filter(gain > 15000) %>%
+      filter(length_miles > 90) %>%
+      select(location_region, name, length_miles, gain) %>%
+      arrange(name) 
     #> # A tibble: 5 x 4
     #>   location_region    name                                     length_miles  gain
     #>   <chr>              <chr>                                           <dbl> <dbl>
@@ -178,6 +212,17 @@ First we’ll look at average rating by feature, then fit a model. First,
 a scatter-plot of number of features listed for a trail with user
 rating. Looks like at a certain point, it’s diminshing returns on trail
 features in terms of effect on rating.
+
+
+    tt_watraildf %>%
+      distinct(name, .keep_all = TRUE) %>%
+      ggplot(aes(feature_n, rating)) +
+      geom_point() +
+      geom_smooth() +
+      labs(x = "# of features on a trail", y = "User rating",
+           title = "Features and Rating by Trail Region") +
+      facet_wrap(vars(location_region))
+
 <img src="images/unnamed-chunk-7-1.png" width="100%" />
 
 Here’s a table similar to the one for averages by region. I used the
@@ -196,6 +241,13 @@ counter-intuitive given that we saw in the charts that length, elevation
 and gain seem to positively affect rating. But then the model only
 accounts for 4% of varaince, so it’s not telling us much.
 
+
+    # creat df with distinct observations for each trail 
+    tt_watraildf_dist <- tt_watraildf %>%
+      distinct(name, .keep_all = TRUE) 
+
+    wtmodel1 <- lm(rating ~ length_miles + gain + highpoint + feature_n, data = tt_watraildf_dist)
+    summary(wtmodel1)
     #> 
     #> Call:
     #> lm(formula = rating ~ length_miles + gain + highpoint + feature_n, 
