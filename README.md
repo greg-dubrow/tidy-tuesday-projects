@@ -1,4 +1,4 @@
-Code and output for #tidytuesday datasets.
+Code and output for [#tidytuesday datasets](https://github.com/rfordatascience/tidytuesday).
 
 [November 24, 2020: Washington Hiking Trails](https://github.com/greg-dubrow/tidy-tuesday-projects/blob/master/tt_20201124_watrails.md)
 
