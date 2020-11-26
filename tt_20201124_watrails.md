@@ -120,11 +120,10 @@ together in a neat panel.
     (hist_length | hist_gain) /
       (hist_high | hist_rate)
 
-<img src="images/unnamed-chunk-3-1.png" width="100%" /> For the
-scatterplots, I plotted length by gain, faceting by ratings groups and
-then by region. We do have to be careful with ratings, as they are
-user-generated and some trails have very few votes. Log10 used again for
-length.
+<img src="images/tt_watr01-1.png" width="100%" /> For the scatterplots,
+I plotted length by gain, faceting by ratings groups and then by region.
+We do have to be careful with ratings, as they are user-generated and
+some trails have very few votes. Log10 used again for length.
 
 
     tt_watraildf %>%
@@ -137,7 +136,7 @@ length.
            title = "Length v Gain, by Rating Group") +
       facet_wrap(vars(rating_grp))
 
-<img src="images/unnamed-chunk-4-1.png" width="100%" />
+<img src="images/tt_watr02-1.png" width="100%" />
 
 
     tt_watraildf %>%
@@ -150,7 +149,7 @@ length.
            title = "Length v Gain, by Region") +
       facet_wrap(vars(location_region))
 
-<img src="images/unnamed-chunk-4-2.png" width="100%" />
+<img src="images/tt_watr02-2.png" width="100%" />
 
 The outliers in terms of gain & length clustered in a few regions, so I
 wanted to see which they were. Not a surprise they clustered in the
@@ -254,7 +253,7 @@ features in terms of effect on rating.
            title = "Features and Rating by Trail Region") +
       facet_wrap(vars(location_region))
 
-<img src="images/unnamed-chunk-7-1.png" width="100%" />
+<img src="images/tt_watr05-1.png" width="100%" />
 
 Here’s a table similar to the one for averages by region. I used the
 unnested features, so trails will be represented more than once. While

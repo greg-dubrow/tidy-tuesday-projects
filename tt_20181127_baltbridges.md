@@ -59,7 +59,7 @@ Read in raw data, get it ready for analysis
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/unnamed-chunk-2-1.png" width="100%" />
+<img src="images/tt_baltbr01-1.png" width="100%" />
 
     ## percent bridge condition by county
     # need to create df object to do subset label call in bar chart
@@ -82,7 +82,7 @@ Read in raw data, get it ready for analysis
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/unnamed-chunk-3-1.png" width="100%" />
+<img src="images/tt_baltbr02-1.png" width="100%" />
 
     ## median age of bridges by county
     tt_baltdf %>%
@@ -99,7 +99,7 @@ Read in raw data, get it ready for analysis
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/unnamed-chunk-4-1.png" width="100%" />
+<img src="images/tt_baltbr03-1.png" width="100%" />
 
 
     ## median months since last inspection by county
@@ -117,7 +117,7 @@ Read in raw data, get it ready for analysis
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/unnamed-chunk-5-1.png" width="100%" />
+<img src="images/tt_baltbr04-1.png" width="100%" />
 
     ## median & interquartile months since last inspection by county
     tt_baltdf %>%
@@ -141,7 +141,7 @@ Read in raw data, get it ready for analysis
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/unnamed-chunk-6-1.png" width="100%" />
+<img src="images/tt_baltbr05-1.png" width="100%" />
 
     ## age by months since last inspection
     tt_baltdf %>%
@@ -152,7 +152,7 @@ Read in raw data, get it ready for analysis
            y = "Age (in years)") +
       theme_minimal()
 
-<img src="images/unnamed-chunk-7-1.png" width="100%" />
+<img src="images/tt_baltbr06-1.png" width="100%" />
 
      # same but outliers removed
     tt_baltdf %>%
@@ -165,7 +165,7 @@ Read in raw data, get it ready for analysis
            y = "Age (in years)") +
       theme_minimal()
 
-<img src="images/unnamed-chunk-8-1.png" width="100%" />
+<img src="images/tt_baltbr07-1.png" width="100%" />
 
     ## age by months since last inspection, by county
     tt_baltdf %>%
@@ -181,7 +181,7 @@ Read in raw data, get it ready for analysis
             legend.box.just = "right",
             legend.margin = margin(6, 6, 6, 6))
 
-<img src="images/unnamed-chunk-9-1.png" width="100%" />
+<img src="images/tt_baltbr08-1.png" width="100%" />
 
     ## median of daily riders of bridges by county - 
         # note reorder w/out - before y to sort by top avgtraf
@@ -199,7 +199,7 @@ Read in raw data, get it ready for analysis
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/unnamed-chunk-10-1.png" width="100%" />
+<img src="images/tt_baltbr09-1.png" width="100%" />
 
     # median & interquartiles of daily riders of bridges by county -
     tt_baltdf %>%
@@ -223,7 +223,7 @@ Read in raw data, get it ready for analysis
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/unnamed-chunk-11-1.png" width="100%" />
+<img src="images/tt_baltbr10-1.png" width="100%" />
 
     ## age by avg daily riders by county
     tt_baltdf %>%
@@ -240,4 +240,4 @@ Read in raw data, get it ready for analysis
             legend.box.just = "right",
             legend.margin = margin(6, 6, 6, 6))
 
-<img src="images/unnamed-chunk-12-1.png" width="100%" />
+<img src="images/tt_baltbr11-1.png" width="100%" />
