@@ -68,7 +68,7 @@ tt_baltdf <- as.data.frame(tt_balt_gh) %>%
 ```
 
 
-```{r tt_baltbr01, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr01, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 tt_baltdf %>% 
   mutate(county = str_replace(county, " County", "")) %>%
   count(decade_built) %>%
@@ -81,7 +81,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r tt_baltbr02, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr02, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## percent bridge condition by county
 # need to create df object to do subset label call in bar chart
 brcondcty <- 
@@ -104,7 +104,7 @@ ggplot(brcondcty, aes(x = county, y = pct, fill = bridge_condition)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r tt_baltbr03, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr03, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## median age of bridges by county
 tt_baltdf %>%
   group_by(county) %>%
@@ -121,7 +121,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r tt_baltbr04, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr04, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 
 ## median months since last inspection by county
 tt_baltdf %>%
@@ -139,7 +139,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r tt_baltbr05, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr05, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## median & interquartile months since last inspection by county
 tt_baltdf %>%
   group_by(county) %>%
@@ -163,7 +163,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r tt_baltbr06, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr06, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## age by months since last inspection
 tt_baltdf %>%
   ggplot(aes(inspect_months, age)) +
@@ -174,7 +174,7 @@ tt_baltdf %>%
   theme_minimal()
 ```
 
-```{r tt_baltbr07, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr07, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
  # same but outliers removed
 tt_baltdf %>%
   filter(age <150, inspect_months <60) %>%
@@ -187,7 +187,7 @@ tt_baltdf %>%
   theme_minimal()
 ```
 
-```{r tt_baltbr08, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr08, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## age by months since last inspection, by county
 tt_baltdf %>%
   ggplot(aes(inspect_months, age, color = county)) +
@@ -203,7 +203,7 @@ tt_baltdf %>%
         legend.margin = margin(6, 6, 6, 6))
 ```
 
-```{r tt_baltbr09, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr09, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## median of daily riders of bridges by county - 
     # note reorder w/out - before y to sort by top avgtraf
 tt_baltdf %>%
@@ -221,7 +221,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r tt_baltbr10, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr10, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 # median & interquartiles of daily riders of bridges by county -
 tt_baltdf %>%
   group_by(county) %>%
@@ -245,7 +245,7 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r tt_baltbr11, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr11, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## age by avg daily riders by county
 tt_baltdf %>%
   ggplot(aes(avg_daily_traffic, age, color = county)) +
