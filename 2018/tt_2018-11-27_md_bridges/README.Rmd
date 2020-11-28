@@ -66,7 +66,9 @@ tt_baltdf <- as.data.frame(tt_balt_gh) %>%
   mutate(inspect_months = inspect_daysn / 30.417)
 ```
 
-### First few charts look at bridges built by decade, the condition of all bridges by county, and how long since last inspection
+### First few charts look at bridges built by decade, the condition of all bridges by county, and how long since last inspection.
+
+Peak bridge-biulding in Maryland was 19502 through 1990s, with a significant drop since then. 
 
 ```{r tt_baltbr01, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 tt_baltdf %>% 
@@ -80,6 +82,8 @@ tt_baltdf %>%
   theme_minimal() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
+
+Baltimore City has the lowest percentage of bridges in good condition, Anne Arundel the most. Baltimore City & Harford County seems to have the largest percentage of bridges in poor condition. 
 
 ```{r tt_baltbr02, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## percent bridge condition by county
@@ -104,6 +108,8 @@ ggplot(brcondcty, aes(x = county, y = pct, fill = bridge_condition)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
+Give the condition percentages, no surprise that Baltimore County & City and Harford County bridges are older than in other counties. 
+
 ```{r tt_baltbr03, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## median age of bridges by county
 tt_baltdf %>%
@@ -121,6 +127,8 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
+It's somewhat reassuring then that Baltimore City bridges at least have less time in months since last inspection than do the counties. 
+
 ```{r tt_baltbr04, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 
 ## median months since last inspection by county
@@ -133,62 +141,45 @@ tt_baltdf %>%
   geom_text(aes(label = round(medinsp, digits = 1)), 
             size = 5, color = "white", vjust = 1.6) +
   ylim(0, 60) +
-  labs(title = "Median months since last inspection, by county" , 
+  labs(title = "Median months since last inspection, by county",
+       subtitle = "_from March 2020_",
        x = "", y = "") +
   theme_minimal() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
+
+It might be the outliers pulling the smoothing line straight, but doesn't seem to be too much of a relartionship between age and time since last inspection.
 
 ```{r tt_baltbr05, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
-## median & interquartile months since last inspection by county
-tt_baltdf %>%
-  group_by(county) %>%
-  summarise(medmths = median(inspect_months),
-            lq = quantile(inspect_months, 0.25),
-            uq = quantile(inspect_months, 0.75)) %>%
-  ungroup() %>%
-  ggplot(aes(county, medmths)) +
-  geom_linerange(aes(ymin = lq, ymax = uq), size = 2, color = "navy") +
-  geom_point(size = 3, color = "orange", alpha = .8) +
-  geom_text(aes(label = round(medmths, digits = 1)), 
-            size = 4, color = "orange", hjust = 1.2) +
-  geom_text(aes(y = uq, label = round(uq, digits = 0)), 
-            size = 4, color = "navy", hjust = 1.2) +
-  geom_text(aes(y = lq, label = round(lq, digits = 0)), 
-            size = 4, color = "navy", hjust = 1.2) +
-  ylim(0, 60) +
-  labs(title = "Median & interquartile months since last inspection, by county" , 
-       x = "", y = "") +
-  theme_minimal() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-```
-
-```{r tt_baltbr06, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## age by months since last inspection
 tt_baltdf %>%
   ggplot(aes(inspect_months, age)) +
   geom_point(color = "navy") +
   geom_smooth() +
-  labs(x = "Months since last inspection (from current date)",
-       y = "Age (in years)") +
+  labs(x = "Months since last inspection _(from March 2020)_",
+       y = "Age _(in years)_") +
   theme_minimal()
 ```
 
-```{r tt_baltbr07, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
- # same but outliers removed
+And in fact, removing the outliers shows a slight relationship; the older bridges do seem to get inspected more frequently. In terms of a better visualization, looking at this again, I wonder if some jittering or another type of plot might have been more visually appealing, givne the clustering of most recent inspections. 
+
+```{r tt_baltbr06, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+# same but outliers removed
 tt_baltdf %>%
   filter(age <150, inspect_months <60) %>%
   ggplot(aes(inspect_months, age)) +
   geom_point(color = "navy") +
   geom_smooth() +
   labs(title = "Months since inspection, outliers removed", 
-       x = "Months since last inspection (from current date)",
-       y = "Age (in years)") +
+       x = "Months since last inspection _(from March 2020)_",
+       y = "Age _(in years)_") +
   theme_minimal()
 ```
 
-```{r tt_baltbr08, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
-## age by months since last inspection, by county
+Not sure if scatter-plot with colors by county is best way to go for this idea. Maybe a tree map?
+
+```{r tt_baltbr07, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+# same but colors by county
 tt_baltdf %>%
   ggplot(aes(inspect_months, age, color = county)) +
   geom_point() +
@@ -203,25 +194,9 @@ tt_baltdf %>%
         legend.margin = margin(6, 6, 6, 6))
 ```
 
-```{r tt_baltbr09, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
-## median of daily riders of bridges by county - 
-    # note reorder w/out - before y to sort by top avgtraf
-tt_baltdf %>%
-  group_by(county) %>%
-  summarise(medtraf = median(avg_daily_traffic)) %>%
-  ungroup() %>%
-  ggplot(aes(reorder((county), medtraf), medtraf)) +
-  geom_bar(stat = "identity", fill= "navy") +
-  geom_text(aes(label = comma(round(medtraf, digits = 0))), color = "white", hjust = 1.2) +
-  scale_y_continuous(label = comma) +
-  labs(title = "Median of average daily bridge traffic, by county" ,
-        x = "", y = "") +
-  coord_flip() +
-  theme_minimal() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-```
+Funky distributions here...Anne Arundel & Baltimore City have the highest median daily riders, but Howard County's upper quartile is way out there. 
 
-```{r tt_baltbr10, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_baltbr09, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 # median & interquartiles of daily riders of bridges by county -
 tt_baltdf %>%
   group_by(county) %>%
@@ -245,7 +220,9 @@ tt_baltdf %>%
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-```{r tt_baltbr11, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+As with the other scatterplot with colors for county, might need a different way to see relationship between bridge age and daily traffic by county.
+
+```{r tt_baltbr10, fig.width=7.5, fig.height=4.0, dpi = 300, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 ## age by avg daily riders by county
 tt_baltdf %>%
   ggplot(aes(avg_daily_traffic, age, color = county)) +
