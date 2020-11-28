@@ -193,7 +193,7 @@ byregion %>%
   cols_label(location_region = "Region", n_region = "N", avglength = "Avg Length (miles)",
              avgrating = "Avg Rating", avggain = "Avg Gain (ft)",avghigh = "Avg Highpoint",
              minhigh = "Lowest high point", maxhigh = "Max high point") %>%
-  gtsave("images/tt11242020_gtavgbyregion.png")
+  gtsave("tt11242020_gtavgbyregion.png")
 
 ## reactable table
 ## create color palate objects for conidtional cell colors
@@ -352,7 +352,7 @@ byfeature %>%
   cols_label(features_unnest = "Feature", n_feature = "Trails w/ Feature", avglength = "Avg Length (miles)",
              avgrating = "Avg Rating", avggain = "Avg Gain (ft)",avghigh = "Avg Highpoint",
              minhigh = "Lowest high point", maxhigh = "Max high point") %>%
-  gtsave("images/tt11242020_gtavgbyfeature.png")
+  gtsave("tt11242020_gtavgbyfeature.png")
 
 
 

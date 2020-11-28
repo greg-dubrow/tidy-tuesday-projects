@@ -2,14 +2,16 @@
 title: "Tidy Tuesday 11/24/2020 Washington Trails"
 author: "greg dubrow"
 date: "11/24/2020"
-output: md_document
+output:
+  html_document:
+    keep_md: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "images/",
+#  fig.path = "images/",
   out.width = "100%") 
 ```
 
@@ -212,7 +214,7 @@ byregion <-  tt_watraildf %>%
 #            avgrating = "Avg Rating", avggain = "Avg Gain (ft)",avghigh = "Avg Highpoint",
 #             minhigh = "Lowest high point", maxhigh = "Max high point")
 ```
-![](images/tt11242020_gtavgbyregion.png)
+![](tt11242020_gtavgbyregion.png)
 
 ### Now let's look at the effect of trail features on rating.
 
@@ -232,7 +234,7 @@ tt_watraildf %>%
 ```
 
 Here's a table similar to the one for averages by region. I used the unnested features, so trails will be represented more than once. While dog-free trails do get the highest ratings, it's likely because they're the highest, so offer views and challenge and get good ratings. 
-![](images/tt11242020_gtavgbyfeature.png)
+![](tt11242020_gtavgbyfeature.png)
 
 ### And finally a quick model to see what might affect a trail rating.
 
