@@ -3,8 +3,7 @@ title: "Tidy Tuesday 11/24/2020 Washington Trails"
 author: "greg dubrow"
 date: "11/24/2020"
 output:
-  html_document:
-    keep_md: yes
+  md_document:
     preserve_yaml: false
 ---
 
@@ -12,7 +11,7 @@ output:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-#  fig.path = "images/",
+  fig.path = "images/",
   out.width = "100%") 
 ```
 
