@@ -1,3 +1,5 @@
+### [Tidy Tuesday](https://github.com/rfordatascience/tidytuesday) for [November 24, 2020](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-11-24). A look at hiking trails in Washington State.
+
     # readin in data, create df for plots
     library(tidytuesdayR) # to load tidytuesday data
     library(tidyverse) # to do tidyverse things
