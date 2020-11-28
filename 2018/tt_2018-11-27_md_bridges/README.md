@@ -128,7 +128,7 @@ less time in months since last inspection than do the counties.
                 size = 5, color = "white", vjust = 1.6) +
       ylim(0, 60) +
       labs(title = "Median months since last inspection, by county",
-           subtitle = "_from March 2020_",
+           subtitle = "as of March 2020",
            x = "", y = "") +
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
@@ -144,7 +144,7 @@ since last inspection.
       ggplot(aes(inspect_months, age)) +
       geom_point(color = "navy") +
       geom_smooth() +
-      labs(x = "Months since last inspection _(from March 2020)_",
+      labs(x = "Months since last inspection (as of March 2020)",
            y = "Age _(in years)_") +
       theme_minimal()
 
@@ -163,7 +163,7 @@ the clustering of most recent inspections.
       geom_point(color = "navy") +
       geom_smooth() +
       labs(title = "Months since inspection, outliers removed", 
-           x = "Months since last inspection _(from March 2020)_",
+           x = "Months since last inspection (as of March 2020)",
            y = "Age _(in years)_") +
       theme_minimal()
 
