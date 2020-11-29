@@ -118,6 +118,8 @@ tdf_stagedata <- as_tibble(combo_df %>%
 glimpse(tdf_stagedata)
 saveRDS(tdf_stagedata, "data/tdf_stagedata.rds")
 
+tdf_stagedata <- readRDS("data/tdf_stagedata.rds")
+
 tdf_stagedata %>%
   filter(year == 1938) %>%
 #  filter(stage_results_id == "stage-10") %>%

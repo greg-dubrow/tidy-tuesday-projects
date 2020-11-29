@@ -1,8 +1,8 @@
-### [Tidy Tuesday](https://github.com/rfordatascience/tidytuesday) for [April 7, 2020](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-04-07), a trove of data on \[The Tour de France(<a href="https://www.letour.fr/en/" class="uri">https://www.letour.fr/en/</a>).
+### [Tidy Tuesday](https://github.com/rfordatascience/tidytuesday) for [April 7, 2020](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-04-07), a trove of data on [The Tour de France](https://www.letour.fr/en/).
 
 ![](Kraftwerk_Tour_De_France_Soundtracks_album_cover.png)
 
-    # readin in data, create df for plots
+    # load packages
     library(tidytuesdayR) # to load tidytuesday data
     library(tidyverse) # to do tidyverse things
     library(tidylog) # to get a log of what's happening to the data
@@ -21,14 +21,16 @@ via
 [Kaggle](https://www.kaggle.com/jaminliu/a-brief-tour-of-tour-de-france-in-numbers/)
 
 There are three distinct sets to work thru, each going back to the first
-run of the race in 1903: \* A dataframe of overall ([General
-Classification, or Yellow Jersey / *maillot
+run of the race in 1903:  
+\* A dataframe of overall ([General Classification, or Yellow Jersey /
+*maillot
 jaune*](https://en.wikipedia.org/wiki/General_classification_in_the_Tour_de_France))
-winners from 1903 to 2019 comes from the Tidy Tuesday frame. \* A
-dataframe with stage winners for races 1903 to 2017, also in the Tidy
-Tuesday set, sourced from Kaggle. \* A frame of overall stage results,
-sourced from the `tdf` pacakge due to issues with date conversion in the
-data included in the Tidy Tuesday set.
+winners from 1903 to 2019 comes from the Tidy Tuesday frame.  
+\* A dataframe with stage winners for races 1903 to 2017, also in the
+Tidy Tuesday set, sourced from Kaggle.  
+\* A frame of overall stage results, sourced from the `tdf` pacakge due
+to issues with date conversion in the data included in the Tidy Tuesday
+set.
 
 The stage winner set needs a bit of mungung…I created a
 stage\_results\_id column similar to the one in the stage results set.
@@ -66,7 +68,7 @@ But it needs leading zeros for stages 1-9 so it sorts properly.
     #> $ birth_country <chr> "Italy", "France", "France", "France", "France", "Franc…
     #> $ nationality   <chr> " France", " France", " France", " France", " France", …
 
-    # create stage winner set. in tt file, comes from kaggle, includes up to 2017
+    # create stage winner set. in Tidy Tuesday file, comes from kaggle, includes up to 2017
     tdf_stagewin <- tt_tdf$tdf_stages %>%
       mutate(race_year = lubridate::year(Date)) %>% 
       mutate(Stage = ifelse(Stage == "P", "0", Stage)) %>%
@@ -105,9 +107,9 @@ Tidy Tuesday page. Some operations will take a while. Those parts of the
 code commented out here so they don’t run while the page kints &
 compiles. For analysis, I’ll load in the saved rds set.
 
-In terms of cleaning: \* The stage\_results\_id & rank fields needs
-leading zeros. \* The rank field needs a bit of clean-up to fix the
-1000s codes.
+In terms of cleaning:  
+\* The stage\_results\_id & rank fields needs leading zeros. \* The rank
+field needs a bit of clean-up to fix the 1000s codes.
 
 
     glimpse(tdf::editions)
