@@ -1,0 +1,120 @@
+---
+title: "Tidy Tuesday 04/07/2020 - Une histoire du Le Tour"
+author: "greg dubrow"
+date: "11/24/2020"
+output:
+  md_document:
+    preserve_yaml: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "images/",
+  out.width = "100%") 
+```
+
+### [Tidy Tuesday](https://github.com/rfordatascience/tidytuesday) for [April 7, 2020](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-04-07), a trove of data on [The Tour de France(https://www.letour.fr/en/).
+
+![](Kraftwerk_Tour_De_France_Soundtracks_album_cover.png)
+
+```{r pkg load, message=FALSE, ECHO = TRUE}
+# readin in data, create df for plots
+library(tidytuesdayR) # to load tidytuesday data
+library(tidyverse) # to do tidyverse things
+library(tidylog) # to get a log of what's happening to the data
+library(tdf) # to get original stag results file
+
+#library(patchwork) # stitch plots together
+#library(gt) # lets make tables
+#library(RColorBrewer) # colors!
+#library(scales) # format chart output
+```
+
+There's a ton of data here, sourced from the [`tdf` package from Alastair Rushworth](https://github.com/alastairrushworth/tdf) and (Thomas Camminady's data set) (https://github.com/camminady/LeTourDataSet), via [Kaggle](https://www.kaggle.com/jaminliu/a-brief-tour-of-tour-de-france-in-numbers/)
+
+There are three distinct sets to work thru, each going back to the first run of the race in 1903:
+  * A dataframe of overall ([General Classification, or Yellow Jersey / _maillot jaune_](https://en.wikipedia.org/wiki/General_classification_in_the_Tour_de_France)) winners from 1903 to 2019 comes from the Tidy Tuesday frame.
+  * A dataframe with stage winners for races 1903 to 2017, also in the Tidy Tuesday set, sourced from Kaggle.
+  * A frame of overall stage results, sourced from the `tdf` pacakge due to issues with date conversion in the data included in the Tidy Tuesday set.
+
+
+The stage winner set needs a bit of mungung...I created a stage_results_id column similar to the one in the stage results set. But it needs leading zeros for stages 1-9 so it sorts properly.
+```{r tt_letourdl, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+# load main file from tt repo
+tt_tdf <- tidytuesdayR::tt_load('2020-04-07')
+
+# create race winners set. comes from tdf package. includes up to 2019
+tdf_winners <- as_tibble(tt_tdf$tdf_winners)
+glimpse(tdf_winners)
+
+# create stage winner set. in tt file, comes from kaggle, includes up to 2017
+tdf_stagewin <- tt_tdf$tdf_stages %>%
+  mutate(race_year = lubridate::year(Date)) %>% 
+  mutate(Stage = ifelse(Stage == "P", "0", Stage)) %>%
+  mutate(stage_ltr = case_when(str_detect(Stage, "a") ~ "a",
+                               str_detect(Stage, "b") ~ "b",
+                               str_detect(Stage, "c") ~ "c",
+                               TRUE ~ "")) %>%
+  mutate(stage_num = str_remove_all(Stage, "[abc]")) %>%
+  mutate(stage_num = stringr::str_pad(stage_num, 2, side = "left", pad = 0)) %>% 
+  mutate(stage_results_id = paste0("stage-", stage_num, stage_ltr)) %>%
+  mutate(split_stage = ifelse(stage_ltr %in% c("a", "b", "c"), "yes", "no")) %>%
+  select(race_year, stage_results_id, stage_date = Date, Type, split_stage,
+         Origin, Destination, Distance, Winner, Winner_Country, everything())
+
+glimpse(tdf_stagewin)
+```
+
+Stage data in CSV from tt repository seems to have truncated the times, leaving only the seconds in a character field. To get complete results we need to pull from `tdf` package using the cleaning script from the Tidy Tuesday page. Some operations will take a while. Those parts of the code commented out here so they don't run while the page kints & compiles. For analysis, I'll load in the saved rds set.
+
+In terms of cleaning: 
+  * The stage_results_id & rank fields needs leading zeros.
+  * The rank field needs a bit of clean-up to fix the 1000s codes.
+
+```{r tt_letourdl2, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+
+glimpse(tdf::editions)
+
+# all_years <- tdf::editions %>% 
+#   unnest_longer(stage_results) %>% 
+#   mutate(stage_results = map(stage_results, ~ mutate(.x, rank = as.character(rank)))) %>% 
+#   unnest_longer(stage_results) 
+# 
+# stage_all <- all_years %>% 
+#   select(stage_results) %>% 
+#   flatten_df()
+# 
+# combo_df <- bind_cols(all_years, stage_all) %>% 
+#   select(-stage_results)
+# 
+# tdf_stagedata <- as_tibble(combo_df %>% 
+#   select(edition, start_date,stage_results_id:last_col()) %>% 
+#   mutate(year = lubridate::year(start_date)) %>% 
+#   rename(age = age...25) %>% 
+#   
+#   # to add leading 0 to stage, extract num, create letter, add 0s to num, paste
+#   mutate(stage_num = str_replace(stage_results_id, "stage-", "")) %>%
+#   mutate(stage_ltr = case_when(str_detect(stage_num, "a") ~ "a",
+#                                str_detect(stage_num, "b") ~ "b",
+#                                TRUE ~ ""))) %>%
+#   mutate(stage_num = str_remove_all(stage_num, "[ab]")) %>%
+#   mutate(stage_num = stringr::str_pad(stage_num, 2, side = "left", pad = 0)) %>%
+#   mutate(stage_results_id2 = paste0("stage-", stage_num, stage_ltr)) %>%
+#   mutate(split_stage = ifelse(stage_ltr %in% c("a", "b"), "yes", "no")) %>% 
+#   
+#   # fix 1000s rank. change to DNF
+#   mutate(rank = ifelse(rank %in% c("1003", "1005", "1006"), "DNF", rank)) %>%
+#   mutate(rank2 = ifelse(rank %notin% c("DF", "DNF", "DNS", "DSQ","NQ","OTL"), 
+#                         stringr::str_pad(rank, 3, side = "left", pad = 0), rank)) %>% 
+#   select(-stage_results_id, -start_date, ) %>%
+#   select(edition, year, stage_results_id = stage_results_id2, split_stage, rider, rank2, 
+#          time, elapsed, points, bib_number, team, age, everything())
+# 
+# saveRDS(tdf_stagedata, "data/tdf_stagedata.rds")
+
+tdf_stagedata <- readRDS("data/tdf_stagedata.rds")
+glimpse(tdf_stagedata)
+
+```
