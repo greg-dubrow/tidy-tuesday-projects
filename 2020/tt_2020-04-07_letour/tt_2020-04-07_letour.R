@@ -15,17 +15,20 @@ library(webshot)
 
 
 ## overall race results for finisheers up to 2020...need to figure out how to merge with tdf package sets
-tdf_bigset <- read.csv("https://github.com/camminady/LeTourDataSet/blob/master/Riders.csv?raw=true")
+tdf_bigset <- read.csv("https://github.com/camminady/LeTourDataSet/blob/master/Riders.csv?raw=true") %>%
+  mutate(Rider = str_to_title(Rider)) %>%
+  rename(rownum = X)
 
 glimpse(tdf_bigset)
 
-tdf_bigset %>%
+tdf2020 <- tdf_bigset %>%
   filter(Year == 2020) %>%
+  mutate(edition = 107) %>%
   view()
 
 # load main file from tt repo
 tt_tdf <- tidytuesdayR::tt_load('2020-04-07')
-glimpse(tt_tdf$)
+
 # unpack the three datasets
 
 # create race winners set. comes from tdf package. includes up to 2019
@@ -110,7 +113,10 @@ tdf_stagedata <- as_tibble(combo_df %>%
                         stringr::str_pad(rank, 3, side = "left", pad = 0), rank)) %>% 
   select(-stage_results_id, -start_date, ) %>%
   select(edition, year, stage_results_id = stage_results_id2, split_stage, rider, rank2, 
-         time, elapsed, points, bib_number, team, age, everything())) 
+         time, elapsed, points, bib_number, team, age, everything())
+
+glimpse(tdf_stagedata)
+saveRDS(tdf_stagedata, "data/tdf_stagedata.rds")
 
 tdf_stagedata %>%
   filter(year == 1938) %>%
@@ -121,25 +127,6 @@ tdf_stagedata %>%
   count(year, stage_results_id) %>%
   arrange(year, stage_results_id) %>%
   view()
-
-glimpse(tdf_stagedata)
-
-tdf_stagedata <- tt_tdf$stage_data %>%
-  mutate(stage_results_id = case_when(stage_results_id == "stage-0" ~ "stage-00",
-                                      stage_results_id == "stage-1" ~ "stage-01",
-                                      stage_results_id == "stage-2" ~ "stage-02",
-                                      stage_results_id == "stage-3" ~ "stage-03",
-                                      stage_results_id == "stage-4" ~ "stage-04",
-                                      stage_results_id == "stage-5" ~ "stage-05",
-                                      stage_results_id == "stage-6" ~ "stage-06",
-                                      stage_results_id == "stage-7" ~ "stage-07",
-                                      stage_results_id == "stage-8" ~ "stage-08",
-                                      stage_results_id == "stage-9" ~ "stage-09",
-                                      TRUE ~ stage_results_id)) %>%
-  mutate(rank = ifelse(rank %in% c("1003", "1005", "1006"), "DNF", rank)) %>%
-  mutate(rank2 = ifelse(rank %notin% c("DNF", "DNS", "DSQ", "OTL"), 
-                        stringr::str_pad(rank, 3, side = "left", pad = 0), rank)) %>%
-  mutate(elapsed2 = lubridate::period(elapsed))
 
 ## stage winners
 glimpse(tdf_stagewin)
@@ -160,9 +147,6 @@ tdf_stagedata %>%
   arrange(year, stage_results_id) %>%
   view()
 
-tdf_stagedata %>%
-  filter(rank %in% c("201", "202", "203", "204")) %>%
-  view()
 
 tdf_stagedata %>%
   count(rank2, rank) %>%

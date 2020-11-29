@@ -15,10 +15,10 @@ Read in raw data, get it ready for analysis
     today_yr <- as.numeric(format(today, format="%Y"))
 
 
-    tt_balt_gh <-
+    tt_mdbr_gh <-
     read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-11-27/baltimore_bridges.csv")
 
-    tt_baltdf <- as.data.frame(tt_balt_gh) %>%
+    tt_mdbrdf <- as.data.frame(tt_mdbr_gh) %>%
       mutate(age = today_yr - yr_built) %>%
       #  mutate(vehicles_n = as.numeric(str_remove(vehicles, " vehicles")))
       ## not needed, avg_daily_traffic has same info
@@ -55,7 +55,7 @@ Read in raw data, get it ready for analysis
 Peak bridge-biulding in Maryland was 19502 through 1990s, with a
 significant drop since then.
 
-    tt_baltdf %>% 
+    tt_mdbrdf %>% 
       mutate(county = str_replace(county, " County", "")) %>%
       count(decade_built) %>%
       ggplot(aes(decade_built, n)) +
@@ -66,7 +66,7 @@ significant drop since then.
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/tt_baltbr01-1.png" width="100%" />
+<img src="images/tt_mdbr01-1.png" width="100%" />
 
 Baltimore City has the lowest percentage of bridges in good condition,
 Anne Arundel the most. Baltimore City & Harford County seems to have the
@@ -75,7 +75,7 @@ largest percentage of bridges in poor condition.
     ## percent bridge condition by county
     # need to create df object to do subset label call in bar chart
     brcondcty <- 
-    tt_baltdf %>%
+    tt_mdbrdf %>%
       count(county, bridge_condition) %>%
       group_by(county) %>%
       mutate(pct = n / sum(n)) %>%
@@ -93,13 +93,13 @@ largest percentage of bridges in poor condition.
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/tt_baltbr02-1.png" width="100%" />
+<img src="images/tt_mdbr02-1.png" width="100%" />
 
 Give the condition percentages, no surprise that Baltimore County & City
 and Harford County bridges are older than in other counties.
 
     ## median age of bridges by county
-    tt_baltdf %>%
+    tt_mdbrdf %>%
       group_by(county) %>%
       summarise(medage = median(age)) %>%
       ungroup() %>%
@@ -113,14 +113,14 @@ and Harford County bridges are older than in other counties.
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/tt_baltbr03-1.png" width="100%" />
+<img src="images/tt_mdbr03-1.png" width="100%" />
 
 It’s somewhat reassuring then that Baltimore City bridges at least have
 less time in months since last inspection than do the counties.
 
 
     ## median months since last inspection by county
-    tt_baltdf %>%
+    tt_mdbrdf %>%
       group_by(county) %>%
       summarise(medinsp = median(inspect_months)) %>%
       ungroup() %>%
@@ -135,14 +135,14 @@ less time in months since last inspection than do the counties.
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/tt_baltbr04-1.png" width="100%" />
+<img src="images/tt_mdbr04-1.png" width="100%" />
 
 It might be the outliers pulling the smoothing line straight, but
 doesn’t seem to be too much of a relartionship between age and time
 since last inspection.
 
     ## age by months since last inspection
-    tt_baltdf %>%
+    tt_mdbrdf %>%
       ggplot(aes(inspect_months, age)) +
       geom_point(color = "navy") +
       geom_smooth() +
@@ -150,7 +150,7 @@ since last inspection.
            y = "Age _(in years)_") +
       theme_minimal()
 
-<img src="images/tt_baltbr05-1.png" width="100%" />
+<img src="images/tt_mdbr05-1.png" width="100%" />
 
 And in fact, removing the outliers shows a slight relationship; the
 older bridges do seem to get inspected more frequently. In terms of a
@@ -159,7 +159,7 @@ or another type of plot might have been more visually appealing, givne
 the clustering of most recent inspections.
 
     # same but outliers removed
-    tt_baltdf %>%
+    tt_mdbrdf %>%
       filter(age <150, inspect_months <60) %>%
       ggplot(aes(inspect_months, age)) +
       geom_point(color = "navy") +
@@ -169,13 +169,13 @@ the clustering of most recent inspections.
            y = "Age _(in years)_") +
       theme_minimal()
 
-<img src="images/tt_baltbr06-1.png" width="100%" />
+<img src="images/tt_mdbr06-1.png" width="100%" />
 
 Not sure if scatter-plot with colors by county is best way to go for
 this idea. Maybe a tree map?
 
     # same but colors by county
-    tt_baltdf %>%
+    tt_mdbrdf %>%
       ggplot(aes(inspect_months, age, color = county)) +
       geom_point() +
       scale_color_brewer(palette="Dark2") +
@@ -188,14 +188,14 @@ this idea. Maybe a tree map?
             legend.box.just = "right",
             legend.margin = margin(6, 6, 6, 6))
 
-<img src="images/tt_baltbr07-1.png" width="100%" />
+<img src="images/tt_mdbr07-1.png" width="100%" />
 
 Funky distributions here…Anne Arundel & Baltimore City have the highest
 median daily riders, but Howard County’s upper quartile is way out
 there.
 
     # median & interquartiles of daily riders of bridges by county -
-    tt_baltdf %>%
+    tt_mdbrdf %>%
       group_by(county) %>%
       summarise(medtraf = median(avg_daily_traffic),
                 lq = quantile(avg_daily_traffic, 0.25),
@@ -216,14 +216,14 @@ there.
       theme_minimal() +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
-<img src="images/tt_baltbr09-1.png" width="100%" />
+<img src="images/tt_mdbr08-1.png" width="100%" />
 
 As with the other scatterplot with colors for county, might need a
 different way to see relationship between bridge age and daily traffic
 by county.
 
     ## age by avg daily riders by county
-    tt_baltdf %>%
+    tt_mdbrdf %>%
       ggplot(aes(avg_daily_traffic, age, color = county)) +
       geom_point() +
       scale_color_brewer(palette="Dark2") +
@@ -237,4 +237,4 @@ by county.
             legend.box.just = "right",
             legend.margin = margin(6, 6, 6, 6))
 
-<img src="images/tt_baltbr10-1.png" width="100%" />
+<img src="images/tt_mdbr09-1.png" width="100%" />
