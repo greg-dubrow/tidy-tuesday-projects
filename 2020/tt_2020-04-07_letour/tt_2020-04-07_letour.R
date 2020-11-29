@@ -14,7 +14,7 @@ library(webshot)
 `%notin%` <- negate(`%in%`)
 
 
-## overall race results for finisheers up to 2020...need to figure out how to merge with tdf package sets
+## overall race results for finishers up to 2020...need to figure out how to merge with tdf package sets
 tdf_bigset <- read.csv("https://github.com/camminady/LeTourDataSet/blob/master/Riders.csv?raw=true") %>%
   mutate(Rider = str_to_title(Rider)) %>%
   rename(rownum = X)

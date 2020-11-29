@@ -1,3 +1,6 @@
+*Work in progress*
+------------------
+
 ### [Tidy Tuesday](https://github.com/rfordatascience/tidytuesday) for [April 7, 2020](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-04-07), a trove of data on [The Tour de France](https://www.letour.fr/en/).
 
 ![](Kraftwerk_Tour_De_France_Soundtracks_album_cover.png)
@@ -12,6 +15,9 @@
     #library(gt) # lets make tables
     #library(RColorBrewer) # colors!
     #library(scales) # format chart output
+
+    # create notin operator to help with cleaning & analysis
+    `%notin%` <- negate(`%in%`)
 
 There’s a ton of data here, sourced from the [`tdf` package from
 Alastair Rushworth](https://github.com/alastairrushworth/tdf) and
@@ -111,6 +117,15 @@ In terms of cleaning:
 \* The stage\_results\_id & rank fields needs leading zeros. \* The rank
 field needs a bit of clean-up to fix the 1000s codes.
 
+In the process of cleaning and comparing to the stage winners set, I
+noticed there were some problems in years where individual stages were
+split into 2 or 3 legs (A, B & C). Either while it was scraped or
+combined, the A leg results ended up repeating to the B leg, and in some
+cases the C leg wasn’t reported. I put it in as an issue in the github
+repo. But that shouldn’t take away from what’s an amazing dataset to
+work with. In the analysis section I’ll work around the problems with
+those stages.
+
 
     glimpse(tdf::editions)
     #> Rows: 106
@@ -191,3 +206,18 @@ field needs a bit of clean-up to fix the 1000s codes.
     #> $ year             <dbl> 1903, 1903, 1903, 1903, 1903, 1903, 1903, 1903, 1903…
     #> $ stage_num        <chr> "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1…
     #> $ stage_ltr        <chr> "", "", "", "", "", "", "", "", "", "", "", "", "", …
+
+Poking around the Kaggle site referenced I found this dataset of final
+results for all riders in all races since 1903. A few different fields
+than in the tidy tuesday winners set.
+
+    ## overall race results for finishers up to 2020...need to figure out how to merge with tdf package sets
+    tdf_bigset <- read.csv("https://github.com/camminady/LeTourDataSet/blob/master/Riders.csv?raw=true") %>%
+      mutate(Rider = str_to_title(Rider)) %>%
+      rename(rownum = X)
+
+Now this is a ton of data to work with, and I won’t use it all. Figured
+I’d include the code to get it all in case you get inspired to grab it
+and take a look.
+
+Ok, let’s lok into the data and make some charts and tables.
