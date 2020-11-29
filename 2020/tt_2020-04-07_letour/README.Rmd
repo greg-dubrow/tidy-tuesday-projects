@@ -4,6 +4,7 @@ author: "greg dubrow"
 date: "11/24/2020"
 output:
   md_document:
+    variant: markdown_github
     preserve_yaml: false
 ---
 
