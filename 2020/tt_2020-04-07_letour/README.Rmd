@@ -201,3 +201,9 @@ Now this is a ton of data to work with, and I won't use it all. Figured I'd incl
 
 Ok, let's lok into the data and make some charts and tables. Because there's already been a fair amount of #tidytuesday twitter submissions on the set, I don't want to repeat what's already there. So to start with I think I'll focus on changes over time in how fast stages have been relative to stage type.  
 
+First we merge stage data and stage winner data for full range of fields. Keep all records as some split stages don't have all correct results and/or duped results.
+```{r tt_letour1a, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+tdf_stageall <- merge(tdf_stagedata, tdf_stagewin, by.x = c("race_year", "stage_results_id"),
+                      by.y = c("race_year", "stage_results_id"), all = T)
+```
+
