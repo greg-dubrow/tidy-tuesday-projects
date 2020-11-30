@@ -57,18 +57,11 @@ tt_tdf <- tidytuesdayR::tt_load('2020-04-07')
 
 # create race winners set. comes from tdf package. includes up to 2019
 tdf_winners <- as_tibble(tt_tdf$tdf_winners)
-glimpse(tdf_winners)
-
-tdf_winners %>%
-  filter(edition == 1) %>%
-  view()
 
 # create stage winner set. in tt file, comes from kaggle, includes up to 2017
 tdf_stagewin1 <- tt_tdf$tdf_stages %>%
   mutate_if(is.character, str_trim)
   
-glimpse(tdf_stagewin1)
-
 # pulled 2018 - 2020 from wikipedia
 # read in excel - need to separate route field to Origin & Destination
 tdf_stagewin2 <- readxl::read_excel("data/tdf_stagewinners_2018-20.xlsx") %>%
@@ -78,8 +71,8 @@ tdf_stagewin2 <- readxl::read_excel("data/tdf_stagewinners_2018-20.xlsx") %>%
   mutate_if(is.character, str_trim) %>%
   select(Stage, Date, Distance, Origin, Destination, Type, Winner, Winner_Country = Winner_country)
 
-glimpse(tdf_stagewin2)
-
+# join with rbind (since I made sure to put 2018-2020 data in same shape as tt set)
+# clean up a bit
 tdf_stagewin <- rbind(tdf_stagewin1, tdf_stagewin2) %>%
   mutate(race_year = lubridate::year(Date)) %>% 
   mutate(Stage = ifelse(Stage == "P", "0", Stage)) %>%
@@ -115,21 +108,20 @@ tdf_stagewin <- rbind(tdf_stagewin1, tdf_stagewin2) %>%
          Origin, Destination, Distance, Winner, winner_first, winner_last,
          Winner_Country, everything())
 
+# take a look at this awesome dataset
 glimpse(tdf_stagewin)
 ```
 
 Stage data in CSV from tt repository seems to have truncated the times, leaving only the seconds in a character field. To get complete results we need to pull from `tdf` package using the cleaning script from the Tidy Tuesday page. Some operations will take a while. Those parts of the code commented out here so they don't run while the page kints & compiles. For analysis, I'll load in the saved rds set.
 
 In terms of cleaning:   
-  * The stage_results_id & rank fields needs leading zeros.
-  * The rank field needs a bit of clean-up to fix the 1000s codes.
-  * Since rider names were last-first, I wanted to separate out first and last, and also make a field with the full name, but first name in front. Stackoverlflow was my regex friend here. 
-  * Other minor fixes
+  * The stage_results_id & rank fields needs leading zeros.  
+  * The rank field needs a bit of clean-up to fix the 1000s codes.  
+  * Since rider names were last-first, I wanted to separate out first and last, and also make a field with the full name, but first name in front. Stackoverlflow was my regex friend here.   
+  * Other minor fixes  
 
 In the process of cleaning and comparing to the stage winners set, I noticed there were some problems in years where individual stages were split into 2 or 3 legs (A, B & C). Either while it was scraped or combined, the A leg results ended up repeating to the B leg, and in some cases the C leg wasn't reported. I put it in as an issue in the github repo. But that shouldn't take away from what's an amazing dataset to work with. In the analysis section I'll work around the problems with those stages. 
 ```{r tt_letourdl2, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
-
-glimpse(tdf::editions)
 
 # all_years <- tdf::editions %>% 
 #   unnest_longer(stage_results) %>% 
