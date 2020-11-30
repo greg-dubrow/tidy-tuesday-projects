@@ -254,7 +254,8 @@ I’d include the code to get it all in case you get inspired to grab it
 and take a look.
 
 Ok, let’s lok into the data and make some charts and tables. Because
-there’s already been a fair amount of \#tidytuesday twitter submissions
+there’s already been a fair amount of [\#tidytuesday twitter
+submissions](https://twitter.com/search?q=%23TidyTuesday%20tour%20de%20france&src=typed_query&f=live)
 on the set, I don’t want to repeat what’s already there. So to start
 with I think I’ll focus on changes over time in how fast stages have
 been relative to stage type.

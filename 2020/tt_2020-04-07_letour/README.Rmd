@@ -191,7 +191,7 @@ tdf_bigset <- read.csv("https://github.com/camminady/LeTourDataSet/blob/master/R
 
 Now this is a ton of data to work with, and I won't use it all. Figured I'd include the code to get it all in case you get inspired to grab it and take a look.
 
-Ok, let's lok into the data and make some charts and tables. Because there's already been a fair amount of #tidytuesday twitter submissions on the set, I don't want to repeat what's already there. So to start with I think I'll focus on changes over time in how fast stages have been relative to stage type.  
+Ok, let's lok into the data and make some charts and tables. Because there's already been a fair amount of [#tidytuesday twitter submissions](https://twitter.com/search?q=%23TidyTuesday%20tour%20de%20france&src=typed_query&f=live) on the set, I don't want to repeat what's already there. So to start with I think I'll focus on changes over time in how fast stages have been relative to stage type.  
 
 First we merge stage data and stage winner data for full range of fields. Keep all records as some split stages don't have all correct results and/or duped results.
 ```{r tt_letour1a, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
