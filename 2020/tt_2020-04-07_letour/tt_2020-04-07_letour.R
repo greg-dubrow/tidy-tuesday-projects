@@ -211,24 +211,30 @@ glimpse(tdf_stageall)
 
 stage_gap <-
 tdf_stageall %>%
-#  filter(race_year == 2017) %>%
+  #  delete 1995 stage 16 - neutralized due to death in stage 15, all times the same
   mutate(out = ifelse((race_year == 1995 & stage_results_id == "stage-16"),
                        "drop", "keep")) %>%
   filter(out != "drop") %>%
+  # delete  missing times
   filter(!is.na(time)) %>%
-  group_by(race_year, stage_results_id) %>%
-  distinct(race_year, stage_results_id, time, .keep_all = TRUE) %>%
-  ungroup() %>%
-  filter(time != "0S") %>%
+  # remove dupliate times
+   arrange(race_year, stage_results_id, rank) %>%
+  
+  # distinct(race_year, stage_results_id, time, .keep_all = TRUE) %>%
+  # ungroup() %>%
+  # remove non-finishers/starters, change outside time limit rank to numeric to keep in set
+  #filter(time != "0S") %>%
   filter(rank %notin% c("DF", "DNF", "DNS", "DSQ", "NQ")) %>%
   filter(!is.na(rank)) %>%
-  mutate(rank = case_when(rank == "OTL" ~ "999",
+  mutate(rank_clean = case_when(rank == "OTL" ~ "999",
                            TRUE ~ rank)) %>% 
-  mutate(rank_n = as.integer(rank)) %>%
+  mutate(rank_n = as.integer(rank_clean)) %>%
+  # creates total time in minutes as numeric
   mutate(time_minutes = ifelse(!is.na(elapsed),
                               day(elapsed)*1440 + hour(elapsed)*60 + minute(elapsed) + second(elapsed)/60,
                                NA)) %>%
   mutate(time_minutes = round(time_minutes, 2)) %>%
+  # create rank field to use to select winner, next best, last
   group_by(race_year, stage_results_id) %>% 
   arrange(race_year, stage_results_id, time_minutes) %>%
   mutate(rank_mins = rank(time_minutes)) %>%
@@ -236,21 +242,51 @@ tdf_stageall %>%
                              time_minutes == max(time_minutes) ~ "keep",
                               TRUE ~ "drop")) %>%
   # field for winner, 2nd best, last
-  mutate(compare_grp = case_when(rank_mins == 1 ~ "Winner",
+  mutate(compare_grp = case_when(rank == "1" ~ "Winner",
                                  rank_mins == 2 ~ "Next best",
                                  rank_mins == max(rank_mins) ~ "Last")) %>%
-                                 
+  mutate(compare_grp = factor(compare_grp, levels = c("Winner", "Next best", "Last"))) %>%
   # calculate time from stage winner
   mutate(time_diff = time_minutes - lag(time_minutes, default = first(time_minutes))) %>%
   mutate(time_diff_secs = time_diff*60) %>%
   mutate(time_diff = round(time_diff, 2)) %>%
+  mutate(time_diff_secs = round(time_diff_secs, 0)) %>%
+  mutate(time_diff_period = seconds_to_period(time_diff_secs)) %>%
   ungroup() %>%
-  filter(gap_keep == "keep") %>%
-  select(race_year, stage_results_id, stage_type, rider_firstlast, bib_number, Winner_Country,
-         rank, time, elapsed, time_minutes, time_diff, time_diff_secs, compare_grp) %>%
-  view()
+  # keep only winner, next best and last
+#  filter(gap_keep == "keep") %>%
+  # create race decade field
+  mutate(race_decade = floor(race_year / 10) * 10) %>%
+  mutate(race_decade = as.character(paste0(race_decade, "s"))) %>%
   
+  select(race_year, race_decade, stage_results_id, stage_type, rider_firstlast, bib_number, Winner_Country,
+         rank, rank_clean, rank_n, time, elapsed, time_minutes, time_diff, time_diff_secs, time_diff_period, rank_mins, compare_grp) 
 
+%>%
+  view()
+
+glimpse(stage_gap)
+
+stage_gap %>%
+  count(compare_grp, rank) %>%
+  view()
+
+stage_gap %>%
+  filter(race_year == 1971, stage_results_id == "stage-00") %>%
+  view()
+
+tdf_stageall %>%
+  filter(race_year == 1971, stage_results_id == "stage-00") %>%
+  view()
+
+# some stages had no gap except winner & last
+stage_gap %>%
+  filter(compare_grp != "Winner") %>%
+  filter(stage_type != "Other") %>%
+  group_by(stage_type, compare_grp) %>%
+  summarise(num = n(), 
+            avggap_next = mean(time_diff_period),
+            avggap_next2 = round(seconds_to_period(mean(time_diff_secs)), 2))
   
 # stage types
 tdf_stageall %>%
