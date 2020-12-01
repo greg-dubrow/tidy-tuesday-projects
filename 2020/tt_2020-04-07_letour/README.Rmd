@@ -29,7 +29,7 @@ This is a long post, but I put a lot of work into cleaning the data, so left all
 library(tidytuesdayR) # to load tidytuesday data
 library(tidyverse) # to do tidyverse things
 library(tidylog) # to get a log of what's happening to the data
-library(tdf) # to get original stag results file
+library(tdf) # to get original stage results file
 
 #library(patchwork) # stitch plots together
 #library(gt) # lets make tables

@@ -190,6 +190,10 @@ byregion %>%
                            all mountain areas have lots of gain and highest points_")) %>%
   cols_align(columns = TRUE, align = "center") %>%
   cols_align(columns = "location_region", align = "left") %>%
+  cols_width(vars(location_region) ~ px(150),
+             vars(n_region) ~ px(75),
+             starts_with("avg") ~ px(100),
+             ends_with("high") ~ px(100)) %>%
   cols_label(location_region = "Region", n_region = "N", avglength = "Avg Length (miles)",
              avgrating = "Avg Rating", avggain = "Avg Gain (ft)",avghigh = "Avg Highpoint",
              minhigh = "Lowest high point", maxhigh = "Max high point") %>%
