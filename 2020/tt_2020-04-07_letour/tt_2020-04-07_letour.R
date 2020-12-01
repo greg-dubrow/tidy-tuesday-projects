@@ -220,7 +220,7 @@ tdf_stageall %>%
   # remove dupliate times
    arrange(race_year, stage_results_id, rank) %>%
   
-  # distinct(race_year, stage_results_id, time, .keep_all = TRUE) %>%
+   distinct(race_year, stage_results_id, time, .keep_all = TRUE) %>%
   # ungroup() %>%
   # remove non-finishers/starters, change outside time limit rank to numeric to keep in set
   #filter(time != "0S") %>%
