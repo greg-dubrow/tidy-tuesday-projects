@@ -299,9 +299,12 @@ gapranges %>%
        subtitle = "Median & Inter-quartile Ranges (avg in black)",
        y = "Time Gap from Winner", x = "Stage Type") +
   theme_light() +
-  theme(plot.title = element_text(color = "#0055A4", size = 8),
+  theme(plot.title = element_text(color = "#0055A4", size = 9),
         plot.subtitle = element_text(face = "italic", color = "#EF4135",
-                                     size = 7),
+                                     size = 8),
+        axis.title.x = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4"), 
+        axis.text.x = element_text(color = "#0055A4"),
         axis.text.y=element_blank())
 
 gapplot2 <-
@@ -316,16 +319,18 @@ gapranges %>%
   geom_text(aes(y = uq, label = uq_tp), 
             size = 3, color = "#0055A4", hjust = 1.2) +
   geom_text(aes(y = lq, label = lq_tp), 
-            size = 3, color = "#0055A4", hjust = 1.2) +
+            size = 3, color = "#0055A4", hjust = 1) +
   geom_text(aes(label = avggap_tp, y = avggap_tp),
             size = 3, color = "black", alpha = .8, hjust = -.2) +
   labs(title = "Time Gap from Stage Winner to Slowest Time",
        subtitle = "Median & Inter-quartile Ranges (avg in black)",
        y = "", x = "Stage Type") +
   theme_light() +
-  theme(plot.title = element_text(color = "#0055A4", size = 8),
+  theme(plot.title = element_text(color = "#0055A4", size = 9),
         plot.subtitle = element_text(face = "italic", color = "#EF4135",
-                                     size = 7),
+                                     size = 8),
+        axis.title.x = element_text(color = "#0055A4"),
+        axis.text.x = element_text(color = "#0055A4"),
         axis.text.y=element_blank())
 
 gapplot1 + gapplot2 +
