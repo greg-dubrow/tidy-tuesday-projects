@@ -398,22 +398,23 @@ gapranges %>%
   filter(compare_grp == "Next best") %>%
   ggplot(aes(stage_type, medgap, color = avggap)) +
   geom_linerange(aes(ymin = lq, ymax = uq), size = 2, color = "#0055A4") +
-  geom_point(size = 3, color = "#EF4135") +
-  geom_point(aes(y = avggap), size = 3, color = "black", alpha = .8) +
+  geom_point(size = 2, color = "#EF4135") +
+  geom_point(aes(y = avggap), size = 2, color = "black", alpha = .8) +
   geom_text(aes(label = medgap_tp), 
-            size = 4, color = "#EF4135", hjust = 1.2) +
+            size = 3, color = "#EF4135", hjust = 1.2) +
   geom_text(aes(y = uq, label = uq_tp), 
-            size = 4, color = "#0055A4", hjust = 1.2) +
+            size = 3, color = "#0055A4", hjust = 1.2) +
   geom_text(aes(y = lq, label = lq_tp), 
-            size = 4, color = "#0055A4", hjust = 1.2) +
+            size = 3, color = "#0055A4", hjust = 1.2) +
   geom_text(aes(label = avggap_tp, y = avggap_tp),
-            size = 4, color = "black", alpha = .8, hjust = -.2) +
+            size = 3, color = "black", alpha = .8, hjust = -.2) +
   labs(title = "Time Gap from Stage Winner to Next Best Time",
        subtitle = "Median & Inter-quartile Ranges (avg in black)",
        y = "Time Gap from Winner", x = "Stage Type") +
   theme_light() +
-  theme(plot.title = element_text(color = "#0055A4"),
-        plot.subtitle = element_text(face = "italic", color = "#EF4135"),
+  theme(plot.title = element_text(color = "#0055A4", size = 8),
+        plot.subtitle = element_text(face = "italic", color = "#EF4135",
+                                     size = 7),
         axis.text.y=element_blank())
 
 gapplot2 <-
@@ -435,9 +436,9 @@ gapranges %>%
        subtitle = "Median & Inter-quartile Ranges (avg in black)",
        y = "", x = "Stage Type") +
   theme_light() +
-  theme(plot.title = element_text(color = "#0055A4", size = 9),
+  theme(plot.title = element_text(color = "#0055A4", size = 8),
         plot.subtitle = element_text(face = "italic", color = "#EF4135",
-                                     size = 8),
+                                     size = 7),
         axis.text.y=element_blank())
 
 gapplot1 + gapplot2 +
