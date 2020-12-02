@@ -282,7 +282,7 @@ gapranges %>%
   geom_text(aes(y = lq, label = lq_tp), 
             size = 4, color = "#0055A4", hjust = 1.2) +
   geom_text(aes(label = avggap_tp, y = avggap_tp),
-            size = 4, color = "black", alpha = .8, hjust = -.2) +
+            size = 4, color = "black", alpha = .8, hjust = -.1) +
   labs(title = "Time Gap from Stage Winner to Next Best Time",
        subtitle = "Median & Inter-quartile Ranges (avg in black)",
        y = "Time Gap from Winner", x = "Stage Type") +
@@ -307,9 +307,9 @@ gapranges %>%
   geom_text(aes(y = uq, label = uq_tp), 
             size = 3, color = "#0055A4", hjust = 1.2) +
   geom_text(aes(y = lq, label = lq_tp), 
-            size = 3, color = "#0055A4", hjust = 1) +
+            size = 3, color = "#0055A4", hjust = 1.1) +
   geom_text(aes(label = avggap_tp, y = avggap_tp),
-            size = 3, color = "black", alpha = .8, hjust = -.2) +
+            size = 3, color = "black", alpha = .8, hjust = -.1) +
   labs(title = "Time Gap from Stage Winner to Slowest Time",
        subtitle = "Median & Inter-quartile Ranges (avg in black)",
        y = "", x = "Stage Type") +
