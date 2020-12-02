@@ -13,10 +13,10 @@ left all that work in. If you just want the charts, scroll down a ways.
 library(tidytuesdayR) # to load tidytuesday data
 library(tidyverse) # to do tidyverse things
 library(tidylog) # to get a log of what's happening to the data
-library(tdf) # to get original stag results file
+library(tdf) # to get original stage results file
 
-#library(patchwork) # stitch plots together
-#library(gt) # lets make tables
+library(patchwork) # stitch plots together
+library(gt) # lets make tables
 #library(RColorBrewer) # colors!
 #library(scales) # format chart output
 
@@ -94,7 +94,7 @@ tdf_stagewin <- rbind(tdf_stagewin1, tdf_stagewin2) %>%
   mutate(winner_first = str_match(Winner, "(^.+)\\s")[, 2]) %>%
   mutate(winner_last= gsub(".* ", "", Winner)) %>%
 
-  # clean up stage types, collapse into fewer groups
+  # clean up stage type
   mutate(stage_type = case_when(Type %in% c("Flat cobblestone stage", "Flat stage", "Flat",
                                             "Flat Stage", "Hilly stage", "Plain stage", 
                                             "Plain stage with cobblestones") 
@@ -104,8 +104,8 @@ tdf_stagewin <- rbind(tdf_stagewin1, tdf_stagewin2) %>%
                                             "Stage with mountain(s)", "Transition stage")
                                 ~ "Mountain",
                                 Type %in% c("Individual time trial", "Mountain time trial") 
-                                ~ "Time Trail - Indiv",
-                                Type == "Team time trial" ~ "Time Trail - Team",
+                                ~ "Time Trial - Indiv",
+                                Type == "Team time trial" ~ "Time Trial - Team",
                                 TRUE ~ "Other")) %>% 
   mutate_if(is.character, str_trim) %>%
   arrange(desc(race_year), stage_results_id) %>%
@@ -253,18 +253,195 @@ Now this is a ton of data to work with, and I won’t use it all. Figured
 I’d include the code to get it all in case you get inspired to grab it
 and take a look.
 
-Ok, let’s lok into the data and make some charts and tables. Because
+Ok, let’s look into the data and make some charts and tables. Because
 there’s already been a fair amount of [\#tidytuesday twitter
 submissions](https://twitter.com/search?q=%23TidyTuesday%20tour%20de%20france&src=typed_query&f=live)
 on the set, I don’t want to repeat what’s already there. So to start
-with I think I’ll focus on changes over time in how fast stages have
-been relative to stage type.
+with let’s focus on changes over time in how fast stages have been
+relative to stage type and the gaps between winners and the rest of the
+field. I also want to look at which riders rode the most stages, who had
+the general best stage placings, and common namnes for stage winners
+among other things.
 
 First we merge stage data and stage winner data for full range of
-fields. Keep all records as some split stages don’t have all correct
-results and/or duped results.
+fields. We’ll keep all records as some split stages don’t have all
+correct results and/or duped results. We’ll sort this out during
+analysis.
 
 ``` r
 tdf_stageall <- merge(tdf_stagedata, tdf_stagewin, by.x = c("race_year", "stage_results_id"),
                       by.y = c("race_year", "stage_results_id"), all = T)
 ```
+
+This set has many columns that we’ll build off of to use in analysis
+going forward. To get the changes in gaps by stage types, we’ll build
+another set. Because we want to look both at changes in stage types and
+gaps between winners and the field, the trick here is to sort out for
+each stage in each race year who the winners are (easy), who has the
+slwest time (mostly easy) and who has the 2nd best record time.
+
+That last item it tough. Why? Well in bike races like the Tour, the same
+time is recorded to all riders who finish within an identifiable group.
+Now each rider with that time will have a rank according to the order
+they crossed the line. But it’s entirely possible for 10-20 riders (even
+more in sprint finishes) to have the same time even as they’re ranked
+1-20. The script below is commented to show why I did what I did. Much
+of the code comes from looking at the data and seeing errors, issues,
+etc. Not including that code here. Also, much of my ability to spot
+errors comes from knowledge about the race, how it’s timed, some
+history. Domain knowledge helps a lot when cleaning & analyzing data.
+
+``` r
+stage_gap <-
+tdf_stageall %>%
+  arrange(race_year, stage_results_id, rank2) %>%
+  #  delete 1995 stage 16 - neutralized due to death in stage 15, all times the same
+  mutate(out = ifelse((race_year == 1995 & stage_results_id == "stage-16"),
+                       "drop", "keep")) %>%
+  filter(out != "drop") %>%
+  # delete  missing times
+  filter(!is.na(time)) %>%
+  # remove non-finishers/starters, change outside time limit rank to numeric to keep in set
+  filter(rank %notin% c("DF", "DNF", "DNS", "DSQ", "NQ")) %>%
+  filter(!is.na(rank)) %>%
+
+  # OTLs are ejected from the race because they finished outside a time limit. But we need them in the set.
+  mutate(rank_clean = case_when(rank == "OTL" ~ "999",
+                           TRUE ~ rank)) %>% 
+  # sortable rank field
+  mutate(rank_n = as.integer(rank_clean)) %>%
+  # creates total time in minutes as numeric, round it to 2 digits
+  mutate(time_minutes = ifelse(!is.na(elapsed),
+                              day(elapsed)*1440 + hour(elapsed)*60 + minute(elapsed) + second(elapsed)/60,
+                               NA)) %>%
+  mutate(time_minutes = round(time_minutes, 2)) %>%
+  
+  # create field for difference from winner
+  group_by(race_year, stage_results_id) %>% 
+  arrange(race_year, stage_results_id, time_minutes, rank2) %>%
+
+  mutate(time_diff = time_minutes - min(time_minutes)) %>%
+  mutate(time_diff_secs = time_diff*60) %>%
+  mutate(time_diff = round(time_diff, 2)) %>%
+  mutate(time_diff_secs = round(time_diff_secs, 0)) %>%
+  mutate(time_diff_period = seconds_to_period(time_diff_secs)) %>%
+  mutate(rank_mins = rank(time_minutes, ties.method = "first")) %>%
+  # create rank field to use to select winner, next best, last
+  mutate(compare_grp = case_when(rank_n == 1 ~ "Winner",
+                                 (rank_n > 1 & time_diff_secs > 0 & rank_mins != max(rank_mins))
+                                 ~ "Next best2",
+                                  rank_mins == max(rank_mins) ~ "Last",
+                                 TRUE ~ "Other")) %>%
+  ungroup() %>%
+  group_by(race_year, stage_results_id, compare_grp) %>% 
+  arrange(race_year, stage_results_id, rank_mins) %>%
+  mutate(compare_grp = ifelse((compare_grp == "Next best2" & rank_mins == min(rank_mins)),
+                               "Next best", compare_grp)) %>%
+  mutate(compare_grp = ifelse(compare_grp == "Next best2", "Other", compare_grp)) %>%
+  ungroup() %>%
+  mutate(compare_grp = factor(compare_grp, levels = c("Winner", "Next best", "Last", "Other"))) %>%
+  # create race decade field
+  mutate(race_decade = floor(race_year / 10) * 10) %>%
+  mutate(race_decade = as.character(paste0(race_decade, "s"))) %>%
+  # keep only winner, next, last
+  filter(compare_grp != "Other") %>%
+  select(race_year, race_decade, stage_results_id, stage_type, rider_firstlast, bib_number, Winner_Country,
+         rank, rank_clean, rank_n, time, elapsed, time_minutes, time_diff, time_diff_secs, time_diff_period, 
+         rank_mins, compare_grp) 
+
+glimpse(stage_gap)
+#> Rows: 6,673
+#> Columns: 18
+#> $ race_year        <dbl> 1903, 1903, 1903, 1903, 1903, 1903, 1903, 1903, 1903…
+#> $ race_decade      <chr> "1900s", "1900s", "1900s", "1900s", "1900s", "1900s"…
+#> $ stage_results_id <chr> "stage-01", "stage-01", "stage-01", "stage-02", "sta…
+#> $ stage_type       <chr> "Flat / Plain / Hilly", "Flat / Plain / Hilly", "Fla…
+#> $ rider_firstlast  <chr> "Maurice Garin", "Émile Pagie", "Pierre Desvages", "…
+#> $ bib_number       <int> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
+#> $ Winner_Country   <chr> "FRA", "FRA", "FRA", "FRA", "FRA", "FRA", "FRA", "FR…
+#> $ rank             <chr> "1", "2", "36", "1", "3", "32", "1", "2", "27", "1",…
+#> $ rank_clean       <chr> "1", "2", "36", "1", "3", "32", "1", "2", "27", "1",…
+#> $ rank_n           <int> 1, 2, 36, 1, 3, 32, 1, 2, 27, 1, 2, 30, 1, 4, 22, 1,…
+#> $ time             <Period> 17H 45M 13S, 55S, 12H 30M 44S, 14H 28M 53S, 26M 6…
+#> $ elapsed          <Period> 17H 45M 13S, 17H 46M 8S, 1d 6H 15M 57S, 14H 28M 5…
+#> $ time_minutes     <dbl> 1065.22, 1066.13, 1815.95, 868.88, 894.98, 1691.87, …
+#> $ time_diff        <dbl> 0.00, 0.91, 750.73, 0.00, 26.10, 822.99, 0.00, 32.36…
+#> $ time_diff_secs   <dbl> 0, 55, 45044, 0, 1566, 49379, 0, 1942, 34914, 0, 243…
+#> $ time_diff_period <Period> 0S, 55S, 12H 30M 44S, 0S, 26M 6S, 13H 42M 59S, 0S…
+#> $ rank_mins        <int> 1, 2, 37, 1, 3, 35, 1, 2, 27, 1, 2, 30, 1, 4, 22, 1,…
+#> $ compare_grp      <fct> Winner, Next best, Last, Winner, Next best, Last, Wi…
+```
+
+Ok, finally, let’s see what this data looks like. First a chart to show
+averages and quartile ranges for the gaps by stage type. First we create
+a data object, then the plots. Faceting by stage type didn’t work
+because the y axis ranges were very different. So we’ll use patchwork to
+stitch them together in one plot.
+
+``` r
+gapranges <- stage_gap %>%
+  filter(compare_grp != "Winner") %>%
+  filter(stage_type %notin% c("Other", "Time Trial - Team")) %>%
+  group_by(stage_type, compare_grp) %>%
+  summarise(num = n(), 
+            lq = quantile(time_diff_secs, 0.25),
+            medgap = median(time_diff_secs),
+            uq = quantile(time_diff_secs, 0.75),
+            lq_tp = (seconds_to_period(quantile(time_diff_secs, 0.25))),
+            medgap_tp = (seconds_to_period(median(time_diff_secs))),
+            uq_tp = (seconds_to_period(quantile(time_diff_secs, 0.75))),
+            avggap = round(mean(time_diff_secs),2),
+            avggap_tp = round(seconds_to_period(mean(time_diff_secs)), 2))
+
+gapplot1 <-
+gapranges %>%
+  filter(compare_grp == "Next best") %>%
+  ggplot(aes(stage_type, medgap, color = avggap)) +
+  geom_linerange(aes(ymin = lq, ymax = uq), size = 2, color = "#0055A4") +
+  geom_point(size = 3, color = "#EF4135") +
+  geom_point(aes(y = avggap), size = 3, color = "black", alpha = .8) +
+  geom_text(aes(label = medgap_tp), 
+            size = 4, color = "#EF4135", hjust = 1.2) +
+  geom_text(aes(y = uq, label = uq_tp), 
+            size = 4, color = "#0055A4", hjust = 1.2) +
+  geom_text(aes(y = lq, label = lq_tp), 
+            size = 4, color = "#0055A4", hjust = 1.2) +
+  geom_text(aes(label = avggap_tp, y = avggap_tp),
+            size = 4, color = "black", alpha = .8, hjust = -.2) +
+  labs(title = "Time Gap from Stage Winner to Next Best Time",
+       subtitle = "Median & Inter-quartile Ranges (avg in black)",
+       y = "Time Gap from Winner", x = "Stage Type") +
+  theme_light() +
+  theme(plot.title = element_text(color = "#0055A4"),
+        plot.subtitle = element_text(face = "italic", color = "#EF4135"),
+        axis.text.y=element_blank())
+
+gapplot2 <-
+gapranges %>%
+  filter(compare_grp == "Last") %>%
+  ggplot(aes(stage_type, medgap, color = avggap)) +
+  geom_linerange(aes(ymin = lq, ymax = uq), size = 2, color = "#0055A4") +
+  geom_point(size = 3, color = "#EF4135") +
+  geom_point(aes(y = avggap), size = 3, color = "black", alpha = .8) +
+  geom_text(aes(label = medgap_tp), 
+            size = 4, color = "#EF4135", hjust = 1.2) +
+  geom_text(aes(y = uq, label = uq_tp), 
+            size = 4, color = "#0055A4", hjust = 1.2) +
+  geom_text(aes(y = lq, label = lq_tp), 
+            size = 4, color = "#0055A4", hjust = 1.2) +
+  geom_text(aes(label = avggap_tp, y = avggap_tp),
+            size = 4, color = "black", alpha = .8, hjust = -.2) +
+  labs(title = "Time Gap from Stage Winner to Slowest Time",
+       subtitle = "Median & Inter-quartile Ranges (avg in black)",
+       y = "", x = "Stage Type") +
+  theme_light() +
+  theme(plot.title = element_text(color = "#0055A4"),
+        plot.subtitle = element_text(face = "italic", color = "#EF4135"),
+        axis.text.y=element_blank())
+
+gapplot1 + gapplot2 +
+  plot_annotation(title = "Tour de France Stages, 1903 to 2019",
+                  theme = theme(plot.title = element_text(color = "#0055A4")))
+```
+
+<img src="images/tt_letour2-1.png" width="100%" />

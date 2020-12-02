@@ -230,7 +230,7 @@ tdf_stageall %>%
                                   rank_mins == max(rank_mins) ~ "Last",
                                  TRUE ~ "Other")) %>%
   ungroup() %>%
-  group_by(race_year, stage_ressults_id, compare_grp) %>% 
+  group_by(race_year, stage_results_id, compare_grp) %>% 
   arrange(race_year, stage_results_id, rank_mins) %>%
   
   mutate(compare_grp = ifelse((compare_grp == "Next best2" & rank_mins == min(rank_mins)),
@@ -250,15 +250,11 @@ tdf_stageall %>%
 glimpse(stage_gap)
 
 stage_gap %>%
-  filter(race_year == 1971) %>%
-  view()
-
-stage_gap %>%
-  count(time_diff_secs) %>%
+  count(race_year) %>%
   view()
 
 # some stages had no gap except winner & last
-gaptest <- stage_gap %>%
+gapranges <- stage_gap %>%
   filter(compare_grp != "Winner") %>%
   filter(stage_type %notin% c("Other", "Time Trial - Team")) %>%
   group_by(stage_type, compare_grp) %>%
@@ -269,22 +265,59 @@ gaptest <- stage_gap %>%
             lq_tp = (seconds_to_period(quantile(time_diff_secs, 0.25))),
             medgap_tp = (seconds_to_period(median(time_diff_secs))),
             uq_tp = (seconds_to_period(quantile(time_diff_secs, 0.75))),
-            #avggap = mean(time_diff_period),
-            avggap = round(seconds_to_period(mean(time_diff_secs)), 2))
+            avggap = round(mean(time_diff_secs),2),
+            avggap_tp = round(seconds_to_period(mean(time_diff_secs)), 2))
 
-gaptest %>%
-  ggplot(aes(compare_grp, medgap)) +
-  geom_linerange(aes(ymin = lq, ymax = uq), size = 2, color = "navy") +
-  geom_point(size = 3, color = "orange", alpha = .8) +
+gapplot1 <-
+gapranges %>%
+  filter(compare_grp == "Next best") %>%
+  ggplot(aes(stage_type, medgap, color = avggap)) +
+  geom_linerange(aes(ymin = lq, ymax = uq), size = 2, color = "#0055A4") +
+  geom_point(size = 3, color = "#EF4135") +
+  geom_point(aes(y = avggap), size = 3, color = "black", alpha = .8) +
   geom_text(aes(label = medgap_tp), 
-            size = 4, color = "orange", hjust = 1.2) +
+            size = 4, color = "#EF4135", hjust = 1.2) +
   geom_text(aes(y = uq, label = uq_tp), 
-            size = 4, color = "navy", hjust = 1.2) +
+            size = 4, color = "#0055A4", hjust = 1.2) +
   geom_text(aes(y = lq, label = lq_tp), 
-            size = 4, color = "navy", hjust = 1.2) +
-  facet_wrap(vars(stage_type))
+            size = 4, color = "#0055A4", hjust = 1.2) +
+  geom_text(aes(label = avggap_tp, y = avggap_tp),
+            size = 4, color = "black", alpha = .8, hjust = -.2) +
+  labs(title = "Time Gap from Stage Winner to Next Best Time",
+       subtitle = "Median & Inter-quartile Ranges (avg in black)",
+       y = "Time Gap from Winner", x = "Stage Type") +
+  theme_light() +
+  theme(plot.title = element_text(color = "#0055A4"),
+        plot.subtitle = element_text(face = "italic", color = "#EF4135"),
+        axis.text.y=element_blank())
 
-  
+gapplot2 <-
+gapranges %>%
+  filter(compare_grp == "Last") %>%
+  ggplot(aes(stage_type, medgap, color = avggap)) +
+  geom_linerange(aes(ymin = lq, ymax = uq), size = 2, color = "#0055A4") +
+  geom_point(size = 3, color = "#EF4135") +
+  geom_point(aes(y = avggap), size = 3, color = "black", alpha = .8) +
+  geom_text(aes(label = medgap_tp), 
+            size = 4, color = "#EF4135", hjust = 1.2) +
+  geom_text(aes(y = uq, label = uq_tp), 
+            size = 4, color = "#0055A4", hjust = 1.2) +
+  geom_text(aes(y = lq, label = lq_tp), 
+            size = 4, color = "#0055A4", hjust = 1.2) +
+  geom_text(aes(label = avggap_tp, y = avggap_tp),
+            size = 4, color = "black", alpha = .8, hjust = -.2) +
+  labs(title = "Time Gap from Stage Winner to Slowest Time",
+       subtitle = "Median & Inter-quartile Ranges (avg in black)",
+       y = "", x = "Stage Type") +
+  theme_light() +
+  theme(plot.title = element_text(color = "#0055A4"),
+        plot.subtitle = element_text(face = "italic", color = "#EF4135"),
+        axis.text.y=element_blank())
+
+gapplot1 + gapplot2 +
+  plot_annotation(title = "Tour de France Stages, 1903 to 2019",
+                  theme = theme(plot.title = element_text(color = "#0055A4")))
+
 # stage types
 tdf_stageall %>%
   distinct(race_year, stage_results_id, .keep_all = TRUE) %>%
