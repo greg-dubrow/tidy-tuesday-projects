@@ -31,8 +31,8 @@ library(tidyverse) # to do tidyverse things
 library(tidylog) # to get a log of what's happening to the data
 library(tdf) # to get original stage results file
 
-#library(patchwork) # stitch plots together
-#library(gt) # lets make tables
+library(patchwork) # stitch plots together
+library(gt) # lets make tables
 #library(RColorBrewer) # colors!
 #library(scales) # format chart output
 
@@ -89,7 +89,7 @@ tdf_stagewin <- rbind(tdf_stagewin1, tdf_stagewin2) %>%
   mutate(winner_first = str_match(Winner, "(^.+)\\s")[, 2]) %>%
   mutate(winner_last= gsub(".* ", "", Winner)) %>%
 
-  # clean up stage types, collapse into fewer groups
+  # clean up stage type
   mutate(stage_type = case_when(Type %in% c("Flat cobblestone stage", "Flat stage", "Flat",
                                             "Flat Stage", "Hilly stage", "Plain stage", 
                                             "Plain stage with cobblestones") 
@@ -99,8 +99,8 @@ tdf_stagewin <- rbind(tdf_stagewin1, tdf_stagewin2) %>%
                                             "Stage with mountain(s)", "Transition stage")
                                 ~ "Mountain",
                                 Type %in% c("Individual time trial", "Mountain time trial") 
-                                ~ "Time Trail - Indiv",
-                                Type == "Team time trial" ~ "Time Trail - Team",
+                                ~ "Time Trial - Indiv",
+                                Type == "Team time trial" ~ "Time Trial - Team",
                                 TRUE ~ "Other")) %>% 
   mutate_if(is.character, str_trim) %>%
   arrange(desc(race_year), stage_results_id) %>%

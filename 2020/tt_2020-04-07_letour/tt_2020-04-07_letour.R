@@ -83,8 +83,8 @@ tdf_stagewin <- rbind(tdf_stagewin1, tdf_stagewin2) %>%
                                             "Stage with mountain(s)", "Transition stage")
                                 ~ "Mountain",
                                 Type %in% c("Individual time trial", "Mountain time trial") 
-                                ~ "Time Trail - Indiv",
-                                Type == "Team time trial" ~ "Time Trail - Team",
+                                ~ "Time Trial - Indiv",
+                                Type == "Team time trial" ~ "Time Trial - Team",
                                 TRUE ~ "Other")) %>% 
   mutate_if(is.character, str_trim) %>%
   arrange(desc(race_year), stage_results_id) %>%
@@ -94,25 +94,11 @@ tdf_stagewin <- rbind(tdf_stagewin1, tdf_stagewin2) %>%
 
 glimpse(tdf_stagewin)
 
-tdf_stagewin %>%
-  filter(race_year == 1967) %>%
-  view()
-  count(stage_type, Type)
-
-
 ## stage data in CSV from tt repository messed up the times. need to pull from tdf package
 # https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-04-07/readme.md using
 # the cleaning script. some operations will take a while. Includes up to 2019
 
 glimpse(tdf::editions)
-stage_all_nest <- tdf::editions$stage_results
-
-glimpse(stage_all_nest$`1938`)
-
-tdfstages_1938 <- stage_all_nest$`1938` %>%
-  flatten_df()
-
-glimpse(tdfstages_1938)
 
 ## from tdf package cleaning script
 all_years <- tdf::editions %>% 
@@ -170,12 +156,6 @@ saveRDS(tdf_stagedata, "data/tdf_stagedata.rds")
 
 tdf_stagedata <- readRDS("data/tdf_stagedata.rds")
 
-tdf_stagedata %>%
-  filter(race_year == 2017 & stage_results_id  == "stage-04") %>%
-  select(rider, bib_number,
-         rank, time, elapsed) %>%
-  view()
-
 ##### Analysis - 
 
 ### changes by stage / race in time of stage winner and spread between winner & last man
@@ -218,9 +198,9 @@ tdf_stageall %>%
   # delete  missing times
   filter(!is.na(time)) %>%
   # remove dupliate times
-   arrange(race_year, stage_results_id, rank) %>%
+   arrange(race_year, stage_results_id, rank2) %>%
   
-   distinct(race_year, stage_results_id, time, .keep_all = TRUE) %>%
+  # distinct(race_year, stage_results_id, time, .keep_all = TRUE) %>%
   # ungroup() %>%
   # remove non-finishers/starters, change outside time limit rank to numeric to keep in set
   #filter(time != "0S") %>%
@@ -236,57 +216,74 @@ tdf_stageall %>%
   mutate(time_minutes = round(time_minutes, 2)) %>%
   # create rank field to use to select winner, next best, last
   group_by(race_year, stage_results_id) %>% 
-  arrange(race_year, stage_results_id, time_minutes) %>%
-  mutate(rank_mins = rank(time_minutes)) %>%
-  mutate(gap_keep = case_when(rank_mins %in% c(1, 2) ~ "keep",
-                             time_minutes == max(time_minutes) ~ "keep",
-                              TRUE ~ "drop")) %>%
-  # field for winner, 2nd best, last
-  mutate(compare_grp = case_when(rank == "1" ~ "Winner",
-                                 rank_mins == 2 ~ "Next best",
-                                 rank_mins == max(rank_mins) ~ "Last")) %>%
-  mutate(compare_grp = factor(compare_grp, levels = c("Winner", "Next best", "Last"))) %>%
-  # calculate time from stage winner
-  mutate(time_diff = time_minutes - lag(time_minutes, default = first(time_minutes))) %>%
+  arrange(race_year, stage_results_id, time_minutes, rank2) %>%
+
+  mutate(time_diff = time_minutes - min(time_minutes)) %>%
   mutate(time_diff_secs = time_diff*60) %>%
   mutate(time_diff = round(time_diff, 2)) %>%
   mutate(time_diff_secs = round(time_diff_secs, 0)) %>%
   mutate(time_diff_period = seconds_to_period(time_diff_secs)) %>%
+  mutate(rank_mins = rank(time_minutes, ties.method = "first")) %>%
+  mutate(compare_grp = case_when(rank_n == 1 ~ "Winner",
+                                 (rank_n > 1 & time_diff_secs > 0 & rank_mins != max(rank_mins))
+                                 ~ "Next best2",
+                                  rank_mins == max(rank_mins) ~ "Last",
+                                 TRUE ~ "Other")) %>%
   ungroup() %>%
-  # keep only winner, next best and last
-#  filter(gap_keep == "keep") %>%
+  group_by(race_year, stage_ressults_id, compare_grp) %>% 
+  arrange(race_year, stage_results_id, rank_mins) %>%
+  
+  mutate(compare_grp = ifelse((compare_grp == "Next best2" & rank_mins == min(rank_mins)),
+                               "Next best", compare_grp)) %>%
+  mutate(compare_grp = ifelse(compare_grp == "Next best2", "Other", compare_grp)) %>%
+  ungroup() %>%
+  mutate(compare_grp = factor(compare_grp, levels = c("Winner", "Next best", "Last", "Other"))) %>%
   # create race decade field
   mutate(race_decade = floor(race_year / 10) * 10) %>%
   mutate(race_decade = as.character(paste0(race_decade, "s"))) %>%
-  
+  # keep only winner, next, last
+  filter(compare_grp != "Other") %>%
   select(race_year, race_decade, stage_results_id, stage_type, rider_firstlast, bib_number, Winner_Country,
-         rank, rank_clean, rank_n, time, elapsed, time_minutes, time_diff, time_diff_secs, time_diff_period, rank_mins, compare_grp) 
-
-%>%
-  view()
+         rank, rank_clean, rank_n, time, elapsed, time_minutes, time_diff, time_diff_secs, time_diff_period, 
+         rank_mins, compare_grp) 
 
 glimpse(stage_gap)
 
 stage_gap %>%
-  count(compare_grp, rank) %>%
+  filter(race_year == 1971) %>%
   view()
 
 stage_gap %>%
-  filter(race_year == 1971, stage_results_id == "stage-00") %>%
-  view()
-
-tdf_stageall %>%
-  filter(race_year == 1971, stage_results_id == "stage-00") %>%
+  count(time_diff_secs) %>%
   view()
 
 # some stages had no gap except winner & last
-stage_gap %>%
+gaptest <- stage_gap %>%
   filter(compare_grp != "Winner") %>%
-  filter(stage_type != "Other") %>%
+  filter(stage_type %notin% c("Other", "Time Trial - Team")) %>%
   group_by(stage_type, compare_grp) %>%
   summarise(num = n(), 
-            avggap_next = mean(time_diff_period),
-            avggap_next2 = round(seconds_to_period(mean(time_diff_secs)), 2))
+            lq = quantile(time_diff_secs, 0.25),
+            medgap = median(time_diff_secs),
+            uq = quantile(time_diff_secs, 0.75),
+            lq_tp = (seconds_to_period(quantile(time_diff_secs, 0.25))),
+            medgap_tp = (seconds_to_period(median(time_diff_secs))),
+            uq_tp = (seconds_to_period(quantile(time_diff_secs, 0.75))),
+            #avggap = mean(time_diff_period),
+            avggap = round(seconds_to_period(mean(time_diff_secs)), 2))
+
+gaptest %>%
+  ggplot(aes(compare_grp, medgap)) +
+  geom_linerange(aes(ymin = lq, ymax = uq), size = 2, color = "navy") +
+  geom_point(size = 3, color = "orange", alpha = .8) +
+  geom_text(aes(label = medgap_tp), 
+            size = 4, color = "orange", hjust = 1.2) +
+  geom_text(aes(y = uq, label = uq_tp), 
+            size = 4, color = "navy", hjust = 1.2) +
+  geom_text(aes(y = lq, label = lq_tp), 
+            size = 4, color = "navy", hjust = 1.2) +
+  facet_wrap(vars(stage_type))
+
   
 # stage types
 tdf_stageall %>%
