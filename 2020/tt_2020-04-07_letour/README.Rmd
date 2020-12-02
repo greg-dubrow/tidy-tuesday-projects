@@ -265,7 +265,7 @@ glimpse(stage_gap)
 ```
 
 Ok, finally, let's see what this data looks like. First a chart to show averages and quartile ranges for the gaps by stage type. First we create a data object, then the plots. Faceting by stage type didn't work because the y axis ranges were very different. So we'll use patchwork to stitch them together in one plot.
-```{r tt_letour2, echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+```{r tt_letour2, fig.width=7.5, fig.height=4.0, dpi = 300,  echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
 gapranges <- stage_gap %>%
   filter(compare_grp != "Winner") %>%
   filter(stage_type %notin% c("Other", "Time Trial - Team")) %>%
@@ -322,8 +322,9 @@ gapranges %>%
        subtitle = "Median & Inter-quartile Ranges (avg in black)",
        y = "", x = "Stage Type") +
   theme_light() +
-  theme(plot.title = element_text(color = "#0055A4"),
-        plot.subtitle = element_text(face = "italic", color = "#EF4135"),
+  theme(plot.title = element_text(color = "#0055A4", size = 9),
+        plot.subtitle = element_text(face = "italic", color = "#EF4135",
+                                     size = 8),
         axis.text.y=element_blank())
 
 gapplot1 + gapplot2 +

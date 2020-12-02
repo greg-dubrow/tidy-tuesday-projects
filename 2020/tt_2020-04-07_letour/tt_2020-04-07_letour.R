@@ -287,8 +287,9 @@ gapranges %>%
        subtitle = "Median & Inter-quartile Ranges (avg in black)",
        y = "Time Gap from Winner", x = "Stage Type") +
   theme_light() +
-  theme(plot.title = element_text(color = "#0055A4"),
-        plot.subtitle = element_text(face = "italic", color = "#EF4135"),
+  theme(plot.title = element_text(color = "#0055A4", size = 9),
+        plot.subtitle = element_text(face = "italic", color = "#EF4135",
+                                     size = 8),
         axis.text.y=element_blank())
 
 gapplot2 <-
@@ -310,13 +311,15 @@ gapranges %>%
        subtitle = "Median & Inter-quartile Ranges (avg in black)",
        y = "", x = "Stage Type") +
   theme_light() +
-  theme(plot.title = element_text(color = "#0055A4"),
-        plot.subtitle = element_text(face = "italic", color = "#EF4135"),
+  theme(plot.title = element_text(color = "#0055A4", size = 9),
+        plot.subtitle = element_text(face = "italic", color = "#EF4135",
+                                     size = 8),
         axis.text.y=element_blank())
 
 gapplot1 + gapplot2 +
   plot_annotation(title = "Tour de France Stages, 1903 to 2019",
-                  theme = theme(plot.title = element_text(color = "#0055A4")))
+                  theme = theme(plot.title = 
+                                  element_text(color = "#0055A4", size = 10)))
 
 # stage types
 tdf_stageall %>%
