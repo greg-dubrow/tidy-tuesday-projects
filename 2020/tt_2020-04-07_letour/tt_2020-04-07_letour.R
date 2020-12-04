@@ -176,6 +176,8 @@ tdf_stageall <- merge(tdf_stagedata, tdf_stagewin, by.x = c("race_year", "stage_
                       by.y = c("race_year", "stage_results_id"), all = T)
 glimpse(tdf_stageall)
 
+saveRDS(tdf_stageall, "data/tdf_stageall.rds")
+
 # tdf_stageall %>%
 #   filter(race_year == 1967) %>%
 #   filter(is.na(stage_type)) %>%

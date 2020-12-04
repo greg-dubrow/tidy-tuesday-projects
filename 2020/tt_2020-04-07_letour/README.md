@@ -469,9 +469,9 @@ ways. First some static charts, faceting out by degree decade.
 
 First thing that needs doing is to build a dataframe for analysis - it
 will have medians my race year and stage type. But for the chart we want
-to hacve a decade field. Turns out this was a bit complicated in order
-to get the chart I wanted. You can see in the code comments why I did
-what I did.
+to have a decade field. Turns out this was a bit complicated in order to
+get the chart I wanted. You can see in the code comments why I did what
+I did.
 
 ``` r
 
@@ -696,12 +696,13 @@ the time threshold, they are going to be well behind on the day. But on
 flat stages, the only thing that keeps a rider more than a few minutes
 back is a spill, flat, or just having a bad day.
 
-Now it’s worth noting that I did not normalize for stage distnce in
-terms of comparing year to year. I went with the assumption that since I
-was grouping multiple stages into a year, that even over time this would
-normalize itself.If this were a more serious analysis I’d do it.
+Now it’s worth noting that I did not normalize for stage distance or
+elevation gain (for mountain stages) in terms of comparing year to year.
+I went with the assumption that since I was grouping multiple stages
+into a year, that even over time this would normalize itself. If this
+were a more serious analysis I’d do it.
 
-Another extenstion of this analysis would be a model to predict time
+Another extention of this analysis would be a model to predict time
 gaps. Then I’d include stage distance, rider height/weight, and other
 factors.
 
