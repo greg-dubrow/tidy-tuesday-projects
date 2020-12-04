@@ -435,7 +435,7 @@ gaprangesyrdec %>%
         axis.title.y = element_text(color = "#0055A4" , size = 8),
         axis.text.x = element_text(color = "#0055A4", size = 8),
         axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_mtnb2 <-
 gaprangesyrdec %>%
@@ -452,7 +452,7 @@ gaprangesyrdec %>%
         axis.title.y = element_text(color = "#0055A4" , size = 8),
         axis.text.x = element_text(color = "#0055A4", size = 8),
         axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_mtnb3 <-
 gaprangesyrdec %>%
@@ -469,7 +469,7 @@ gaprangesyrdec %>%
         axis.title.y = element_text(color = "#0055A4" , size = 8),
         axis.text.x = element_text(color = "#0055A4", size = 8),
         axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_mtnb1 / plot_dec_mtnb2 / plot_dec_mtnb3 +
   plot_annotation(title = "Gaps Between Winner & Next Best Times are Narrowing",
@@ -487,8 +487,8 @@ Most obviously, and not surprisingly, the gaps between winner and next best time
 
 We also see the effect of war. The two world wars not only interrupted the race in those years, but especially in the years immediately after WWII the gaps were larger than in the late 1930s. We can imagine what the war did to the pool of riders. The sport needed time to recover, for riders to train and get back to full fitness. 
 
-Ok, now let's look at the changes in the mountaints from the winners to the time for the last rider(s).
-```{r tt_letour2c, fig.width=7.5, fig.height=4.0, dpi = 300,  echo = TRUE, warning=FALSE, message = FALSE, error= FALSE}
+Ok, now let's look at the changes in the mountaints from the winners to the time for the last rider(s). Because the code is mostly the same for this chart, I'll set the code chunk eecho to FALSE. The only change is `filter(compare_grp == "Last")`
+```{r tt_letour2c, fig.width=7.5, fig.height=4.0, dpi = 300,  echo = FALSE, warning=FALSE, message = FALSE, error= FALSE}
 # mountain winner to last
 plot_dec_mtla1 <-
   gaprangesyrdec %>%
@@ -510,7 +510,7 @@ plot_dec_mtla1 <-
         axis.title.y = element_text(color = "#0055A4", size = 7),
         axis.text.x = element_text(color = "#0055A4", size = 8),
         axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_mtla2 <-
   gaprangesyrdec %>%
@@ -527,7 +527,7 @@ plot_dec_mtla2 <-
         axis.title.y = element_text(color = "#0055A4", size = 7),
         axis.text.x = element_text(color = "#0055A4", size = 8),
         axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_mtla3 <-
   gaprangesyrdec %>%
@@ -544,7 +544,7 @@ plot_dec_mtla3 <-
         axis.title.y = element_text(color = "#0055A4", size = 7),
         axis.text.x = element_text(color = "#0055A4", size = 8),
         axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_mtla1 / plot_dec_mtla2 / plot_dec_mtla3  +
   plot_annotation(title = "Gaps Between Winner & Last Rider Times Mostly Stable Since 1930s",

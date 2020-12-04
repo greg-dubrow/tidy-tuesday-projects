@@ -483,7 +483,7 @@ plot_dec_mtla1 <-
         axis.title.y = element_text(color = "#0055A4"),
         axis.text.x = element_text(color = "#0055A4"),
         axis.text.y = element_text(color = "#0055A4"),
-        strip.background = element_rect(fill = "#0055A4"))
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_mtla2 <-
   gaprangesyrdec %>%

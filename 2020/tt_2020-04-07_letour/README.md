@@ -587,7 +587,7 @@ gaprangesyrdec %>%
         axis.title.y = element_text(color = "#0055A4" , size = 8),
         axis.text.x = element_text(color = "#0055A4", size = 8),
         axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_mtnb2 <-
 gaprangesyrdec %>%
@@ -604,7 +604,7 @@ gaprangesyrdec %>%
         axis.title.y = element_text(color = "#0055A4" , size = 8),
         axis.text.x = element_text(color = "#0055A4", size = 8),
         axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_mtnb3 <-
 gaprangesyrdec %>%
@@ -621,7 +621,7 @@ gaprangesyrdec %>%
         axis.title.y = element_text(color = "#0055A4" , size = 8),
         axis.text.x = element_text(color = "#0055A4", size = 8),
         axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_mtnb1 / plot_dec_mtnb2 / plot_dec_mtnb3 +
   plot_annotation(title = "Gaps Between Winner & Next Best Times are Narrowing",
@@ -650,73 +650,7 @@ the war did to the pool of riders. The sport needed time to recover, for
 riders to train and get back to full fitness.
 
 Ok, now let’s look at the changes in the mountaints from the winners to
-the time for the last rider(s).
-
-``` r
-# mountain winner to last
-plot_dec_mtla1 <-
-  gaprangesyrdec %>%
-  filter(compare_grp == "Last") %>%
-  filter(stage_type == "Mountain") %>%
-  filter(race_decade %in% c("1900s", "1910s", "1920s", "1930s")) %>%
-  #  filter(race_decade %in% c("1940s", "1950s", "1960s", "1970s")) %>%
-  ggplot(aes(year_n, medgap)) +
-  geom_line(group = 1, color = "#EF4135") +
-  geom_point(data = subset(gaprangesyrdec, 
-                           (race_year == 1919 & stage_type == "Last" & 
-                              compare_grp == "Next best" & year_n == "9")), 
-             aes(x = year_n, y = medgap), color = "#EF4135") +
-  scale_y_time(labels = waiver()) +
-  labs(x = "Year", y = "H:Min:Sec") + 
-  facet_grid( ~ race_decade) +
-  theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
-        axis.title.y = element_text(color = "#0055A4", size = 7),
-        axis.text.x = element_text(color = "#0055A4", size = 8),
-        axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
-
-plot_dec_mtla2 <-
-  gaprangesyrdec %>%
-  filter(compare_grp == "Last") %>%
-  filter(stage_type == "Mountain") %>%
-  filter(race_decade %in% c("1940s", "1950s", "1960s", "1970s")) %>%
-  ggplot(aes(year_n, medgap)) +
-  geom_line(group = 1, color = "#EF4135") +
-  scale_y_time(limits = c(0, 5400), labels = waiver()) +
-  labs(x = "Year", y = "H:Min:Sec") + 
-  facet_grid( ~ race_decade) +
-  theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
-        axis.title.y = element_text(color = "#0055A4", size = 7),
-        axis.text.x = element_text(color = "#0055A4", size = 8),
-        axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
-
-plot_dec_mtla3 <-
-  gaprangesyrdec %>%
-  filter(compare_grp == "Last") %>%
-  filter(stage_type == "Mountain") %>%
-  filter(race_decade %in% c("1980s", "1990s", "2000s", "2010s")) %>%
-  ggplot(aes(year_n, medgap)) +
-  geom_line(group = 1, color = "#EF4135") +
-  scale_y_time(limits = c(0, 5400), labels = waiver()) +
-  labs(x = "Year", y = "H:Min:Sec") + 
-  facet_grid( ~ race_decade) +
-  theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
-        axis.title.y = element_text(color = "#0055A4", size = 7),
-        axis.text.x = element_text(color = "#0055A4", size = 8),
-        axis.text.y = element_text(color = "#0055A4", size = 7),
-        strip.background = element_rect(fill = "#0055A4"))
-
-plot_dec_mtla1 / plot_dec_mtla2 / plot_dec_mtla3  +
-  plot_annotation(title = "Gaps Between Winner & Last Rider Times Mostly Stable Since 1930s",
-                  subtitle = "Median gap on mountain stages, by year & decade; no race during world wars",
-                  theme = 
-                    theme(plot.title = element_text(color = "#0055A4", size = 10),
-                          plot.subtitle = element_text(color = "#EF4135", 
-                                                       face = "italic", size = 9)))
-```
-
+the time for the last rider(s). Because the code is mostly the same for
+this chart, I’ll set the code chunk eecho to FALSE. The only change is
+`filter(compare_grp == "Last")`
 <img src="images/tt_letour2c-1.png" width="100%" />
