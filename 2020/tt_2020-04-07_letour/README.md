@@ -672,8 +672,38 @@ Ok, last two charts in this series…this time we’ll look at the flat &
 hilly stages. Again, I won’t show the code. Only changes are to the
 filters: `filter(compare_grp == "Next best")` or
 `filter(compare_grp == "Last")` and
-`filter(stage_type == "Flat / Plain / Hilly")`.
+`filter(stage_type == "Flat / Plain / Hilly")`. If you want to see the
+full code, check out tt\_2020-04-07\_letour.R in this directory.
 
 <img src="images/tt_letour2d-1.png" width="100%" />
 
+Perhaps the most surprising thing in the Flat/Hilly stage gaps between
+winners & next best is that the gaps were similar to mountain stages.
+But then from watching the race all these years I remember that the
+climbers finish in groups fairly near to each other, even if the
+mountain stages are so hard.
+
+No surprise of course that for many decades now the gaps have been
+around or under a minute. After the bunch sprints, the next group of
+riders, those not contesting the win, are right behind that pack.
+
 <img src="images/tt_letour2e-1.png" width="100%" />
+
+The gap from winner to last was much less than winner-to-last in
+mountaints, which isn’t a surprise. The sprinters tend to suffer in the
+Alps, Pyrenees and other mountain stages. As long as they come in under
+the time threshold, they are going to be well behind on the day. But on
+flat stages, the only thing that keeps a rider more than a few minutes
+back is a spill, flat, or just having a bad day.
+
+Now it’s worth noting that I did not normalize for stage distnce in
+terms of comparing year to year. I went with the assumption that since I
+was grouping multiple stages into a year, that even over time this would
+normalize itself.If this were a more serious analysis I’d do it.
+
+Another extenstion of this analysis would be a model to predict time
+gaps. Then I’d include stage distance, rider height/weight, and other
+factors.
+
+This is it for this document. If I add anything it’ll be on the blog,
+and I’ll link to it here.
