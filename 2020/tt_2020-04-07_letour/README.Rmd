@@ -481,13 +481,14 @@ plot_dec_mtnb1 / plot_dec_mtnb2 / plot_dec_mtnb3 +
 
 ```
 
-What does this chart tell us? 
+What does this chart tell us? As you look at it, keep in mind the y axis is different in the 1900s - 1930s chart because in the early years of the race the gaps were much wider. 
 
 Most obviously, and not surprisingly, the gaps between winner and next best time shrank as the race professionalized and sports science got better. There are of course outliers here and there in the last few decades, but the course changes year-to-year, and some years the race organizers have made some years more difficult than other in the mountains.
 
 We also see the effect of war. The two world wars not only interrupted the race in those years, but especially in the years immediately after WWII the gaps were larger than in the late 1930s. We can imagine what the war did to the pool of riders. The sport needed time to recover, for riders to train and get back to full fitness. 
 
-Ok, now let's look at the changes in the mountaints from the winners to the time for the last rider(s). Because the code is mostly the same for this chart, I'll set the code chunk eecho to FALSE. The only change is `filter(compare_grp == "Last")`
+Ok, now let's look at the changes in the mountaints from the winners to the time for the last rider(s). Because the code is mostly the same for this chart, I'll set the code chunk echo to FALSE. The only change is `filter(compare_grp == "Last")`
+
 ```{r tt_letour2c, fig.width=7.5, fig.height=4.0, dpi = 300,  echo = FALSE, warning=FALSE, message = FALSE, error= FALSE}
 # mountain winner to last
 plot_dec_mtla1 <-
@@ -547,12 +548,84 @@ plot_dec_mtla3 <-
         strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_mtla1 / plot_dec_mtla2 / plot_dec_mtla3  +
-  plot_annotation(title = "Gaps Between Winner & Last Rider Times Mostly Stable Since 1930s",
+  plot_annotation(title = "Gaps Between Winner & Last Rider Times Mostly Stable Since 1950s",
                   subtitle = "Median gap on mountain stages, by year & decade; no race during world wars",
                   theme = 
                     theme(plot.title = element_text(color = "#0055A4", size = 10),
                           plot.subtitle = element_text(color = "#EF4135", 
                                                        face = "italic", size = 9)))
+```
 
+WHat do we see here? Well first, notice that the gaps in the 1900s to 1930s were huge, especially before the 1930s. By the 1930s the gaps was usually around 30-40 minutes, similar to post-WWII years. But in the early years of the race, the last man in sometimes wouldn't arrive until 10+ hours after the winner!
 
+But since then the gaps are mostly around 30+ minutes. And again, I adjusted to include racers who finish outside of the time-stage cut off, and are thus eliminated from the race overall.
+
+Ok, last two charts in this series...this time we'll look at the flat & hilly stages. Again, I won't show the code. Only changes are to the filters: `filter(compare_grp == "Next best")` or `filter(compare_grp == "Last")` and `filter(stage_type == "Flat / Plain / Hilly")`.
+ 
+```{r tt_letour2d, fig.width=7.5, fig.height=4.0, dpi = 300,  echo = FALSE, warning=FALSE, message = FALSE, error= FALSE}
+ 
+# flat/hilly next best
+plot_dec_flnb1 <-
+  gaprangesyrdec %>%
+  filter(compare_grp == "Next best") %>%
+  filter(stage_type == "Flat / Plain / Hilly") %>%
+  filter(race_decade %in% c("1900s", "1910s", "1920s", "1930s")) %>%
+  #  filter(race_decade %in% c("1940s", "1950s", "1960s", "1970s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  geom_point(data = subset(gaprangesyrdec, 
+                           (race_year == 1919 & stage_type == "Mountain" & 
+                              compare_grp == "Next best" & year_n == "9")), 
+             aes(x = year_n, y = medgap), color = "#EF4135") +
+  scale_y_time(labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4"),
+        axis.text.x = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4"),
+        strip.background = element_rect(fill = "#0055A4"))
+
+plot_dec_flnb2 <-
+  gaprangesyrdec %>%
+  filter(compare_grp == "Next best") %>%
+  filter(stage_type == "Flat / Plain / Hilly") %>%
+  filter(race_decade %in% c("1940s", "1950s", "1960s", "1970s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  scale_y_time(limits = c(0, 300), labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4"),
+        axis.text.x = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4"),
+        strip.background = element_rect(fill = "#0055A4"))
+
+plot_dec_flnb3 <-
+  gaprangesyrdec %>%
+  filter(compare_grp == "Next best") %>%
+  filter(stage_type == "Flat / Plain / Hilly") %>%
+  filter(race_decade %in% c("1980s", "1990s", "2000s", "2010s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  scale_y_time(limits = c(0, 300), labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4"),
+        axis.text.x = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4"),
+        strip.background = element_rect(fill = "#0055A4"))
+
+plot_dec_flnb1 / plot_dec_flnb2 / plot_dec_flnb3 +
+  plot_annotation(title = "Gaps Between Winner & Next Best Times Mostly < 1 Minute Since 1970s",
+                  subtitle = "Median gap on Flat & Hilly stages, by year & decade; no race during world wars",
+                  theme = 
+                    theme(plot.title = element_text(color = "#0055A4", size = 10),
+                          plot.subtitle = element_text(color = "#EF4135", 
+                                                       face = "italic", size = 9)))
 ```

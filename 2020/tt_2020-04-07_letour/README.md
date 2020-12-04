@@ -634,7 +634,9 @@ plot_dec_mtnb1 / plot_dec_mtnb2 / plot_dec_mtnb3 +
 
 <img src="images/tt_letour2b-1.png" width="100%" />
 
-What does this chart tell us?
+What does this chart tell us? As you look at it, keep in mind the y axis
+is different in the 1900s - 1930s chart because in the early years of
+the race the gaps were much wider.
 
 Most obviously, and not surprisingly, the gaps between winner and next
 best time shrank as the race professionalized and sports science got
@@ -651,6 +653,25 @@ riders to train and get back to full fitness.
 
 Ok, now let’s look at the changes in the mountaints from the winners to
 the time for the last rider(s). Because the code is mostly the same for
-this chart, I’ll set the code chunk eecho to FALSE. The only change is
+this chart, I’ll set the code chunk echo to FALSE. The only change is
 `filter(compare_grp == "Last")`
+
 <img src="images/tt_letour2c-1.png" width="100%" />
+
+WHat do we see here? Well first, notice that the gaps in the 1900s to
+1930s were huge, especially before the 1930s. By the 1930s the gaps was
+usually around 30-40 minutes, similar to post-WWII years. But in the
+early years of the race, the last man in sometimes wouldn’t arrive until
+10+ hours after the winner!
+
+But since then the gaps are mostly around 30+ minutes. And again, I
+adjusted to include racers who finish outside of the time-stage cut off,
+and are thus eliminated from the race overall.
+
+Ok, last two charts in this series…this time we’ll look at the flat &
+hilly stages. Again, I won’t show the code. Only changes are to the
+filters: `filter(compare_grp == "Next best")` or
+`filter(compare_grp == "Last")` and
+`filter(stage_type == "Flat / Plain / Hilly")`.
+
+<img src="images/tt_letour2d-1.png" width="100%" />
