@@ -671,9 +671,9 @@ plot_dec_mtla1 <-
   facet_grid( ~ race_decade) +
   theme_light() +
   theme(axis.title.x = element_text(color = "#0055A4"),
-        axis.title.y = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4", size = 9),
         axis.text.x = element_text(color = "#0055A4"),
-        axis.text.y = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4", size = 9),
         strip.background = element_rect(fill = "#0055A4"))
 
 plot_dec_mtla2 <-
@@ -688,9 +688,9 @@ plot_dec_mtla2 <-
   facet_grid( ~ race_decade) +
   theme_light() +
   theme(axis.title.x = element_text(color = "#0055A4"),
-        axis.title.y = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4", size = 9),
         axis.text.x = element_text(color = "#0055A4"),
-        axis.text.y = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4", size = 9),
         strip.background = element_rect(fill = "#0055A4"))
 
 plot_dec_mtla3 <-
@@ -705,9 +705,9 @@ plot_dec_mtla3 <-
   facet_grid( ~ race_decade) +
   theme_light() +
   theme(axis.title.x = element_text(color = "#0055A4"),
-        axis.title.y = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4", size = 9),
         axis.text.x = element_text(color = "#0055A4"),
-        axis.text.y = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4", size = 9),
         strip.background = element_rect(fill = "#0055A4"))
 
 plot_dec_mtla1 / plot_dec_mtla2 / plot_dec_mtla3  +
