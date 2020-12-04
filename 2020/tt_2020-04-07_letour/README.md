@@ -26,9 +26,8 @@ library(gt) # lets make tables
 
 There’s a ton of data here, sourced from the [`tdf` package from
 Alastair Rushworth](https://github.com/alastairrushworth/tdf) and
-(Thomas Camminady’s data set)
-(<a href="https://github.com/camminady/LeTourDataSet" class="uri">https://github.com/camminady/LeTourDataSet</a>),
-via
+[Thomas Camminady’s data
+set](https://github.com/camminady/LeTourDataSet), via
 [Kaggle](https://www.kaggle.com/jaminliu/a-brief-tour-of-tour-de-france-in-numbers/)
 
 There are three distinct sets to work thru, each going back to the first
@@ -373,10 +372,13 @@ glimpse(stage_gap)
 ```
 
 Ok, finally, let’s see what this data looks like. First a chart to show
-averages and quartile ranges for the gaps by stage type. First we create
-a data object, then the plots. Faceting by stage type didn’t work
-because the y axis ranges were very different. So we’ll use patchwork to
-stitch them together in one plot.
+averages and quartile ranges for the gaps by stage type. Create a data
+object with the values, then the plots. Faceting by stage type didn’t
+work because the y axis ranges were very different. So we’ll use
+`patchwork` to stitch them together in one plot. The medians are the red
+dots, interquartile ranges at either end of the line, and means are in
+black. I included both means & medians because the spread for some stage
+types was so great.
 
 ``` r
 gapranges <- stage_gap %>%
@@ -442,8 +444,8 @@ gapranges %>%
   theme(plot.title = element_text(color = "#0055A4", size = 9),
         plot.subtitle = element_text(face = "italic", color = "#EF4135",
                                      size = 8),
-        axis.title.x = element_text(color = "#0055A4"),
-        axis.text.x = element_text(color = "#0055A4"),
+        axis.title.x = element_text(color = "#0055A4", size = 9),
+        axis.text.x = element_text(color = "#0055A4", size = 9),
         axis.text.y=element_blank())
 
 gapplot1 + gapplot2 +
@@ -452,4 +454,269 @@ gapplot1 + gapplot2 +
                                   element_text(color = "#0055A4", size = 10)))
 ```
 
-<img src="images/tt_letour2-1.png" width="100%" />
+<img src="images/tt_letour1c-1.png" width="100%" />
+
+What do these charts tell us? Well unsurprisingly mountain stages tend
+to have longer gaps between winners and the rest of the field than do
+flat/plain/hilly stages. Time trials are usually on flat or hilly
+stages, so they behave more like all other flat/plain/hilly stages. Even
+looking at the median to smooth for outliers, half of the last men in on
+mountain stages came in under 36 minutes, half over 36 minutes. The last
+25% of mountain-stage riders came in an hour or more after the winner.
+
+How has this changes over time? Well let’s look a couple of different
+ways. First some static charts, faceting out by degree decade.
+
+First thing that needs doing is to build a dataframe for analysis - it
+will have medians my race year and stage type. But for the chart we want
+to hacve a decade field. Turns out this was a bit complicated in order
+to get the chart I wanted. You can see in the code comments why I did
+what I did.
+
+``` r
+
+gaprangesyrdec <- 
+stage_gap %>%
+  filter(compare_grp != "Winner") %>%
+  filter(stage_type %notin% c("Other", "Time Trial - Team")) %>%
+  group_by(stage_type, compare_grp, race_year) %>%
+  summarise(num = n(), 
+            lq = quantile(time_diff_secs, 0.25),
+            medgap = median(time_diff_secs),
+            uq = quantile(time_diff_secs, 0.75),
+            lq_tp = (seconds_to_period(quantile(time_diff_secs, 0.25))),
+            medgap_tp = (seconds_to_period(median(time_diff_secs))),
+            uq_tp = (seconds_to_period(quantile(time_diff_secs, 0.75))),
+            avggap = round(mean(time_diff_secs),2),
+            avggap_tp = round(seconds_to_period(mean(time_diff_secs)), 2)) %>%
+  ungroup() %>%
+  # need to hard code in rows so x axis & faceting works in by decade charts
+  add_row(stage_type = "Flat / Plain / Hilly",  compare_grp = "Next best",
+          race_year = 1915, .before = 13) %>%
+  add_row(stage_type = "Flat / Plain / Hilly",  compare_grp = "Next best",
+          race_year = 1916, .before = 14) %>%
+  add_row(stage_type = "Flat / Plain / Hilly",  compare_grp = "Next best",
+          race_year = 1917, .before = 15) %>%
+  add_row(stage_type = "Flat / Plain / Hilly",  compare_grp = "Next best",
+          race_year = 1918, .before = 16) %>%
+  add_row(stage_type = "Flat / Plain / Hilly",  compare_grp = "Last",
+          race_year = 1915, .before = 123) %>%
+  add_row(stage_type = "Flat / Plain / Hilly",  compare_grp = "Last",
+          race_year = 1916, .before = 124) %>%
+  add_row(stage_type = "Flat / Plain / Hilly",  compare_grp = "Last",
+          race_year = 1917, .before = 125) %>%
+  add_row(stage_type = "Flat / Plain / Hilly",  compare_grp = "Last",
+          race_year = 1918, .before = 126) %>%
+  add_row(stage_type = "Mountain",  compare_grp = "Next best",
+          race_year = 1915, .before = 233) %>%
+  add_row(stage_type = "Mountain",  compare_grp = "Next best",
+          race_year = 1916, .before = 234) %>%
+  add_row(stage_type = "Mountain",  compare_grp = "Next best",
+          race_year = 1917, .before = 235) %>%
+  add_row(stage_type = "Mountain",  compare_grp = "Next best",
+          race_year = 1918, .before = 236) %>%
+  add_row(stage_type = "Mountain",  compare_grp = "Last",
+          race_year = 1915, .before = 343) %>%
+  add_row(stage_type = "Mountain",  compare_grp = "Last",
+          race_year = 1916, .before = 344) %>%
+  add_row(stage_type = "Mountain",  compare_grp = "Last",
+          race_year = 1917, .before = 345) %>%
+  add_row(stage_type = "Mountain",  compare_grp = "Last",
+          race_year = 1918, .before = 346) %>%
+
+    # need field for x axis when faciting by decade
+  mutate(year_n = str_sub(race_year,4,4)) %>%
+  # create race decade field
+  mutate(race_decade = floor(race_year / 10) * 10) %>%
+  mutate(race_decade = as.character(paste0(race_decade, "s"))) %>%
+#  mutate(race_decade = ifelse(race_year %in%))
+  arrange(stage_type, compare_grp, race_year) %>%
+  select(stage_type, compare_grp, race_year, year_n, race_decade, everything())
+
+glimpse(gaprangesyrdec)
+#> Rows: 597
+#> Columns: 14
+#> $ stage_type  <chr> "Flat / Plain / Hilly", "Flat / Plain / Hilly", "Flat / P…
+#> $ compare_grp <chr> "Last", "Last", "Last", "Last", "Last", "Last", "Last", "…
+#> $ race_year   <dbl> 1903, 1904, 1905, 1906, 1907, 1908, 1909, 1910, 1911, 191…
+#> $ year_n      <chr> "3", "4", "5", "6", "7", "8", "9", "0", "1", "2", "3", "4…
+#> $ race_decade <chr> "1900s", "1900s", "1900s", "1900s", "1900s", "1900s", "19…
+#> $ num         <int> 5, 5, 9, 11, 9, 10, 10, 9, 8, 8, 8, 8, NA, NA, NA, NA, 9,…
+#> $ lq          <dbl> 34914.00, 58920.00, 19200.00, 22596.00, 27430.00, 28530.0…
+#> $ medgap      <dbl> 45044.0, 71334.0, 23100.0, 24721.0, 31920.0, 34440.0, 308…
+#> $ uq          <dbl> 56900.00, 80285.00, 28456.00, 34230.00, 35100.00, 41175.0…
+#> $ lq_tp       <Period> 9H 41M 54S, 16H 22M 0S, 5H 20M 0S, 6H 16M 36S, 7H 37M …
+#> $ medgap_tp   <Period> 12H 30M 44S, 19H 48M 54S, 6H 25M 0S, 6H 52M 1S, 8H 52M…
+#> $ uq_tp       <Period> 15H 48M 20S, 22H 18M 5S, 7H 54M 16S, 9H 30M 30S, 9H 45…
+#> $ avggap      <dbl> 42780.20, 80268.60, 24040.78, 28669.00, 34906.44, 37350.0…
+#> $ avggap_tp   <Period> 11H 53M 0.2S, 22H 17M 48.6S, 6H 40M 40.78S, 7H 57M 49S…
+```
+
+Now that we have a dataframe to work from, let’s make a chart. But to do
+that we have to make a few charts and then put them together with
+`patchwork`.
+
+First up is changes in the mountain stages. First the median gaps
+between winner and next best recorded time. I grouped into three decade
+sets. Note that because of changes in the gaps over time, the y axes are
+a bit different in the early decades of the race. Also note at how I was
+able to get hours:seconds:minutes to show up on the y axis. The x axis
+digits are that way because race year would repeat in each facet, so I
+had to create a proxy year.
+
+``` r
+
+# mountain winner to next best
+plot_dec_mtnb1 <-
+gaprangesyrdec %>%
+  filter(compare_grp == "Next best") %>%
+  filter(stage_type == "Mountain") %>%
+  filter(race_decade %in% c("1900s", "1910s", "1920s", "1930s")) %>%
+#  filter(race_decade %in% c("1940s", "1950s", "1960s", "1970s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  geom_point(data = subset(gaprangesyrdec, 
+                           (race_year == 1919 & stage_type == "Mountain" & 
+                              compare_grp == "Next best" & year_n == "9")), 
+             aes(x = year_n, y = medgap), color = "#EF4135") +
+  scale_y_time(labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4"),
+        axis.text.x = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4"),
+        strip.background = element_rect(fill = "#0055A4"))
+
+plot_dec_mtnb2 <-
+gaprangesyrdec %>%
+  filter(compare_grp == "Next best") %>%
+  filter(stage_type == "Mountain") %>%
+  filter(race_decade %in% c("1940s", "1950s", "1960s", "1970s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  scale_y_time(limits = c(0, 420), labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4"),
+        axis.text.x = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4"),
+        strip.background = element_rect(fill = "#0055A4"))
+
+plot_dec_mtnb3 <-
+gaprangesyrdec %>%
+  filter(compare_grp == "Next best") %>%
+  filter(stage_type == "Mountain") %>%
+  filter(race_decade %in% c("1980s", "1990s", "2000s", "2010s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  scale_y_time(limits = c(0, 420), labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4"),
+        axis.text.x = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4"),
+        strip.background = element_rect(fill = "#0055A4"))
+
+plot_dec_mtnb1 / plot_dec_mtnb2 / plot_dec_mtnb3 +
+  plot_annotation(title = "Gaps Between Winner & Next Best Times are Narrowing",
+                  subtitle = "Median gap on mountain stages, by year & decade; no race during world wars",
+                  theme = 
+                    theme(plot.title = element_text(color = "#0055A4", size = 10),
+                          plot.subtitle = element_text(color = "#EF4135", 
+                                                       face = "italic", size = 9)))
+```
+
+<img src="images/tt_letour2b-1.png" width="100%" />
+
+What does this chart tell us?
+
+Most obviously, and not surprisingly, the gaps between winner and next
+best time shrank as the race professionalized and sports science got
+better. There are of course outliers here and there in the last few
+decades, but the course changes year-to-year, and some years the race
+organizers have made some years more difficult than other in the
+mountains.
+
+We also see the effect of war. The two world wars not only interrupted
+the race in those years, but especially in the years immediately after
+WWII the gaps were larger than in the late 1930s. We can imagine what
+the war did to the pool of riders. The sport needed time to recover, for
+riders to train and get back to full fitness.
+
+Ok, now let’s look at the changes in the mountaints from the winners to
+the time for the last rider(s).
+
+``` r
+# mountain winner to last
+plot_dec_mtla1 <-
+  gaprangesyrdec %>%
+  filter(compare_grp == "Last") %>%
+  filter(stage_type == "Mountain") %>%
+  filter(race_decade %in% c("1900s", "1910s", "1920s", "1930s")) %>%
+  #  filter(race_decade %in% c("1940s", "1950s", "1960s", "1970s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  geom_point(data = subset(gaprangesyrdec, 
+                           (race_year == 1919 & stage_type == "Last" & 
+                              compare_grp == "Next best" & year_n == "9")), 
+             aes(x = year_n, y = medgap), color = "#EF4135") +
+  scale_y_time(labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4"),
+        axis.text.x = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4"),
+        strip.background = element_rect(fill = "#0055A4"))
+
+plot_dec_mtla2 <-
+  gaprangesyrdec %>%
+  filter(compare_grp == "Last") %>%
+  filter(stage_type == "Mountain") %>%
+  filter(race_decade %in% c("1940s", "1950s", "1960s", "1970s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  scale_y_time(limits = c(0, 5400), labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4"),
+        axis.text.x = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4"),
+        strip.background = element_rect(fill = "#0055A4"))
+
+plot_dec_mtla3 <-
+  gaprangesyrdec %>%
+  filter(compare_grp == "Last") %>%
+  filter(stage_type == "Mountain") %>%
+  filter(race_decade %in% c("1980s", "1990s", "2000s", "2010s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  scale_y_time(limits = c(0, 5400), labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4"),
+        axis.title.y = element_text(color = "#0055A4"),
+        axis.text.x = element_text(color = "#0055A4"),
+        axis.text.y = element_text(color = "#0055A4"),
+        strip.background = element_rect(fill = "#0055A4"))
+
+plot_dec_mtla1 / plot_dec_mtla2 / plot_dec_mtla3  +
+  plot_annotation(title = "Gaps Between Winner & Last Rider Times Mostly Stable Since 1930s",
+                  subtitle = "Median gap on mountain stages, by year & decade; no race during world wars",
+                  theme = 
+                    theme(plot.title = element_text(color = "#0055A4", size = 10),
+                          plot.subtitle = element_text(color = "#EF4135", 
+                                                       face = "italic", size = 9)))
+```
+
+<img src="images/tt_letour2c-1.png" width="100%" />
