@@ -583,7 +583,7 @@ gaprangesyrdec %>%
   labs(x = "Year", y = "H:Min:Sec") + 
   facet_grid( ~ race_decade) +
   theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4"),
+  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
         axis.title.y = element_text(color = "#0055A4", size = 8),
         axis.text.x = element_text(color = "#0055A4"),
         axis.text.y = element_text(color = "#0055A4", size = 8),
@@ -600,7 +600,7 @@ gaprangesyrdec %>%
   labs(x = "Year", y = "H:Min:Sec") + 
   facet_grid( ~ race_decade) +
   theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4"),
+  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
         axis.title.y = element_text(color = "#0055A4", size = 8),
         axis.text.x = element_text(color = "#0055A4"),
         axis.text.y = element_text(color = "#0055A4", size = 8),
@@ -617,7 +617,7 @@ gaprangesyrdec %>%
   labs(x = "Year", y = "H:Min:Sec") + 
   facet_grid( ~ race_decade) +
   theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4"),
+  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
         axis.title.y = element_text(color = "#0055A4" , size = 8),
         axis.text.x = element_text(color = "#0055A4"),
         axis.text.y = element_text(color = "#0055A4", size = 8),
@@ -670,10 +670,10 @@ plot_dec_mtla1 <-
   labs(x = "Year", y = "H:Min:Sec") + 
   facet_grid( ~ race_decade) +
   theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4"),
-        axis.title.y = element_text(color = "#0055A4", size = 8),
+  theme(axis.title.x = element_text(color = "#0055A4", size = 7),
+        axis.title.y = element_text(color = "#0055A4", size = 7),
         axis.text.x = element_text(color = "#0055A4"),
-        axis.text.y = element_text(color = "#0055A4", size = 8),
+        axis.text.y = element_text(color = "#0055A4", size = 7),
         strip.background = element_rect(fill = "#0055A4"))
 
 plot_dec_mtla2 <-
@@ -687,10 +687,10 @@ plot_dec_mtla2 <-
   labs(x = "Year", y = "H:Min:Sec") + 
   facet_grid( ~ race_decade) +
   theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4"),
-        axis.title.y = element_text(color = "#0055A4", size = 8),
+  theme(axis.title.x = element_text(color = "#0055A4", size = 7),
+        axis.title.y = element_text(color = "#0055A4", size = 7),
         axis.text.x = element_text(color = "#0055A4"),
-        axis.text.y = element_text(color = "#0055A4", size = 8),
+        axis.text.y = element_text(color = "#0055A4", size = 7),
         strip.background = element_rect(fill = "#0055A4"))
 
 plot_dec_mtla3 <-
@@ -704,10 +704,10 @@ plot_dec_mtla3 <-
   labs(x = "Year", y = "H:Min:Sec") + 
   facet_grid( ~ race_decade) +
   theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4"),
-        axis.title.y = element_text(color = "#0055A4", size = 8),
+  theme(axis.title.x = element_text(color = "#0055A4", size = 7),
+        axis.title.y = element_text(color = "#0055A4", size = 7),
         axis.text.x = element_text(color = "#0055A4"),
-        axis.text.y = element_text(color = "#0055A4", size = 8),
+        axis.text.y = element_text(color = "#0055A4", size = 7),
         strip.background = element_rect(fill = "#0055A4"))
 
 plot_dec_mtla1 / plot_dec_mtla2 / plot_dec_mtla3  +
