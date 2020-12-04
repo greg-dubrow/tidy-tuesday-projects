@@ -581,11 +581,11 @@ plot_dec_flnb1 <-
   labs(x = "Year", y = "H:Min:Sec") + 
   facet_grid( ~ race_decade) +
   theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4"),
-        axis.title.y = element_text(color = "#0055A4"),
-        axis.text.x = element_text(color = "#0055A4"),
-        axis.text.y = element_text(color = "#0055A4"),
-        strip.background = element_rect(fill = "#0055A4"))
+  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
+        axis.title.y = element_text(color = "#0055A4", size = 7),
+        axis.text.x = element_text(color = "#0055A4", size = 8),
+        axis.text.y = element_text(color = "#0055A4", size = 7),
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_flnb2 <-
   gaprangesyrdec %>%
@@ -598,11 +598,11 @@ plot_dec_flnb2 <-
   labs(x = "Year", y = "H:Min:Sec") + 
   facet_grid( ~ race_decade) +
   theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4"),
-        axis.title.y = element_text(color = "#0055A4"),
-        axis.text.x = element_text(color = "#0055A4"),
-        axis.text.y = element_text(color = "#0055A4"),
-        strip.background = element_rect(fill = "#0055A4"))
+  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
+        axis.title.y = element_text(color = "#0055A4", size = 7),
+        axis.text.x = element_text(color = "#0055A4", size = 8),
+        axis.text.y = element_text(color = "#0055A4", size = 7),
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_flnb3 <-
   gaprangesyrdec %>%
@@ -615,14 +615,83 @@ plot_dec_flnb3 <-
   labs(x = "Year", y = "H:Min:Sec") + 
   facet_grid( ~ race_decade) +
   theme_light() +
-  theme(axis.title.x = element_text(color = "#0055A4"),
-        axis.title.y = element_text(color = "#0055A4"),
-        axis.text.x = element_text(color = "#0055A4"),
-        axis.text.y = element_text(color = "#0055A4"),
-        strip.background = element_rect(fill = "#0055A4"))
+  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
+        axis.title.y = element_text(color = "#0055A4", size = 7),
+        axis.text.x = element_text(color = "#0055A4", size = 8),
+        axis.text.y = element_text(color = "#0055A4", size = 7),
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
 
 plot_dec_flnb1 / plot_dec_flnb2 / plot_dec_flnb3 +
   plot_annotation(title = "Gaps Between Winner & Next Best Times Mostly < 1 Minute Since 1970s",
+                  subtitle = "Median gap on Flat & Hilly stages, by year & decade; no race during world wars",
+                  theme = 
+                    theme(plot.title = element_text(color = "#0055A4", size = 10),
+                          plot.subtitle = element_text(color = "#EF4135", 
+                                                       face = "italic", size = 9)))
+```
+
+
+```{r tt_letour2e, fig.width=7.5, fig.height=4.0, dpi = 300,  echo = FALSE, warning=FALSE, message = FALSE, error= FALSE}
+
+### flat / hilly winner to last
+plot_dec_flla1 <-
+  gaprangesyrdec %>%
+  filter(compare_grp == "Last") %>%
+  filter(stage_type == "Flat / Plain / Hilly") %>%
+  filter(race_decade %in% c("1900s", "1910s", "1920s", "1930s")) %>%
+  #  filter(race_decade %in% c("1940s", "1950s", "1960s", "1970s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  geom_point(data = subset(gaprangesyrdec, 
+                           (race_year == 1919 & stage_type == "Mountain" & 
+                              compare_grp == "Next best" & year_n == "9")), 
+             aes(x = year_n, y = medgap), color = "#EF4135") +
+  scale_y_time(labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
+        axis.title.y = element_text(color = "#0055A4", size = 7),
+        axis.text.x = element_text(color = "#0055A4", size = 8),
+        axis.text.y = element_text(color = "#0055A4", size = 7),
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
+
+plot_dec_flla2 <-
+  gaprangesyrdec %>%
+  filter(compare_grp == "Last") %>%
+  filter(stage_type == "Flat / Plain / Hilly") %>%
+  filter(race_decade %in% c("1940s", "1950s", "1960s", "1970s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  scale_y_time(limits = c(0, 2340), labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
+        axis.title.y = element_text(color = "#0055A4", size = 7),
+        axis.text.x = element_text(color = "#0055A4", size = 8),
+        axis.text.y = element_text(color = "#0055A4", size = 7),
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
+
+plot_dec_flla3 <-
+  gaprangesyrdec %>%
+  filter(compare_grp == "Last") %>%
+  filter(stage_type == "Flat / Plain / Hilly") %>%
+  filter(race_decade %in% c("1980s", "1990s", "2000s", "2010s")) %>%
+  ggplot(aes(year_n, medgap)) +
+  geom_line(group = 1, color = "#EF4135") +
+  scale_y_time(limits = c(0, 2340), labels = waiver()) +
+  labs(x = "Year", y = "H:Min:Sec") + 
+  facet_grid( ~ race_decade) +
+  theme_light() +
+  theme(axis.title.x = element_text(color = "#0055A4", size = 8),
+        axis.title.y = element_text(color = "#0055A4", size = 7),
+        axis.text.x = element_text(color = "#0055A4", size = 8),
+        axis.text.y = element_text(color = "#0055A4", size = 7),
+        strip.background = element_rect(fill = "#0055A4"), strip.text.x = element_text(size = 8))
+
+plot_dec_flla1 / plot_dec_flla2 / plot_dec_flla3 +
+  plot_annotation(title = "Gaps Between Winner & Last Rider Times Very Tight by 1970s, Stabilized to ~ 10 min since",
                   subtitle = "Median gap on Flat & Hilly stages, by year & decade; no race during world wars",
                   theme = 
                     theme(plot.title = element_text(color = "#0055A4", size = 10),

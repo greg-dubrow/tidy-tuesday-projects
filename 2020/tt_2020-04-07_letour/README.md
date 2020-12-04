@@ -675,3 +675,5 @@ filters: `filter(compare_grp == "Next best")` or
 `filter(stage_type == "Flat / Plain / Hilly")`.
 
 <img src="images/tt_letour2d-1.png" width="100%" />
+
+<img src="images/tt_letour2e-1.png" width="100%" />
