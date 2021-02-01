@@ -1,6 +1,7 @@
 library(tidytuesdayR)
 library(tidyverse)
 library(tidylog)
+library(DataExplorer)
 #library(tidygraph)
 #library(ggraph)
 library(gt)
@@ -25,6 +26,8 @@ tt_plastics <- tt_load("2021-01-26")
 tt_plastics_df <- as_tibble(tt_plastics$plastics)
 
 glimpse(tt_plastics_df)
+
+# use dataexplorer package for EDA
 
 data(pop)
 glimpse(pop)
