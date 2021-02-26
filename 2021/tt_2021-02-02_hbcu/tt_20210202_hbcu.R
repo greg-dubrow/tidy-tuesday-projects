@@ -630,10 +630,11 @@ tuit_8715_pctchgh %>%
   filter(sector_desc %in% c("Public 4yr", "Private nonprofit 4yr", "Public 2yr")) %>%
   ggplot(aes(year, enr_tot)) +
   geom_line(color = "#E69F00", size = 1) +
+  geom_hline(yintercept=0, color = "gray") +
   scale_color_manual(values = c("#56B4E9", "#E69F00")) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   labs(title = "Year-over-year Percent Changes to UG Enrollment",
-       subtitle = "Every sector has positive & negative swings", 
+       subtitle = "HBCU sectors had wider positive & negative swings", 
        caption = "Source: Delta Cost Project", 
        x = "", y = "Pct Chnage in-state tuition & fees") +
   facet_grid(hbcu_f ~ sector_desc) +
@@ -650,6 +651,7 @@ tuit_8715_pctchgh %>%
   filter(sector_desc %in% c("Public 4yr", "Private nonprofit 4yr", "Public 2yr")) %>%
   ggplot(aes(year, mean_tuit_in)) +
   geom_line(color = "#E69F00", size = 1) +
+  geom_hline(yintercept=0, color = "gray") +
   scale_color_manual(values = c("#56B4E9", "#E69F00")) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   labs(title = "Year-over-year Percent Changes to Tuition & Fees",
