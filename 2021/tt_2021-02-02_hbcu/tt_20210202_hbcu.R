@@ -193,11 +193,11 @@ glimpse(tuitenr_8715)
 tuitenr_8715 %>% 
   count(hbcu, sector_desc)
 
-tuitenr_8715 %>%
-  filter(sector_desc == "Public 2yr") %>%
-  filter(year == 2010) %>%
-  summarise(toug = sum(total_undergraduates, na.rm = TRUE))
-  write_csv("pub2yr2015.csv")
+# tuitenr_8715 %>%
+#   filter(sector_desc == "Public 2yr") %>%
+#   filter(year == 2010) %>%
+#   summarise(toug = sum(total_undergraduates, na.rm = TRUE))
+#   write_csv("pub2yr2015.csv")
 
 # create dataset of ug enrollment & avg tuition by year w/ cols for hbcu, sector, eth
 tuitenr_8715_agg <-
