@@ -15,7 +15,13 @@ library(webshot)
 
 
 ## overall race results for finishers up to 2020...need to figure out how to merge with tdf package sets
+ ## UPDATE - legacy dataset now in this repo https://github.com/camminady/LeTourDataSetLegacy allriders & allriders2
 tdf_bigset <- read.csv("https://github.com/camminady/LeTourDataSet/blob/master/Riders.csv?raw=true") %>%
+  mutate(Rider = str_to_title(Rider)) %>%
+  rename(rownum = X)
+
+## new dataset here
+tdf_bigset <- read.csv("https://github.com/camminady/LeTourDataSet/blob/master/data/riders.csv?raw=true") %>%
   mutate(Rider = str_to_title(Rider)) %>%
   rename(rownum = X)
 
